@@ -9,8 +9,8 @@ const path = require('path');
 const qs = require('qs');
 
 // 認証情報読み込み
-const aiCoreCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../credentials/ai_core_sk.json'), 'utf8'));
-const userCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../credentials/user_defined_variable.json'), 'utf8'));
+const aiCoreCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/ai_core_sk.json'), 'utf8'));
+const userCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/user_defined_variable.json'), 'utf8'));
 
 const xsuaaHostname = aiCoreCreds.url;
 const xsuaaClient = aiCoreCreds.clientid;

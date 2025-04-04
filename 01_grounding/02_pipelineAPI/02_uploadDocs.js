@@ -9,9 +9,9 @@ const path = require('path');
 const AWS = require('aws-sdk');
 
 // 🔐 認証情報をJSONファイルから読み込み
-const aiCoreCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../credentials/ai_core_sk.json'), 'utf8'));
-const s3Creds = JSON.parse(fs.readFileSync(path.join(__dirname, '../credentials/object_store_sk.json'), 'utf8'));
-const userCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../credentials/user_defined_variable.json'), 'utf8'));
+const aiCoreCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/ai_core_sk.json'), 'utf8'));
+const s3Creds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/object_store_sk.json'), 'utf8'));
+const userCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/user_defined_variable.json'), 'utf8'));
 
 // S3 認証情報
 const s3Info = {
