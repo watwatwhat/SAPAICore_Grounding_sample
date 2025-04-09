@@ -92,6 +92,8 @@ async function createResourceGroup(token) {
 // S3 Secret 作成
 async function createS3Secret(token) {
     const url = `${AI_API_HOST}/v2/admin/secrets`;
+    console.log(`🔑 S3 Secret loaded ${JSON.stringify(s3Info)}`);
+
     const payload = {
         name: secretName,
         data: {
