@@ -4,4 +4,4 @@
 # 
 # ========================
 
-npm install -g axios aws-sdk
+npm install axios aws-sdk qs

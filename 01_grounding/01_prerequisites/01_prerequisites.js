@@ -145,10 +145,16 @@ async function createS3Secret(token) {
         const token = await getXsuaaToken();
 
         // 1. Create A Resource Group For Grounding
-        // SAP AI Coreのインスタンスに演習用のリソースグループを追加する（既存のリソースグループを使う場合にはスキップ！）
+        // SAP AI Coreのインスタンスに演習用のリソースグループを追加する
         // https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/create-resource-group-for-ai-data-management
         console.log('📦 Creating resource group...');
         await createResourceGroup(token);
+
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        // リソースグループ作成後に少し待つ（例：10秒）
+        console.log('⏳ Waiting for resource group propagation for 10s...');
+        await delay(10000);
 
         // 2. Grounding Generic Secrets for AWS S3
         // SAP AI CoreのインスタンスにAmazon S3 へのアクセスに用いる認証情報を登録する
