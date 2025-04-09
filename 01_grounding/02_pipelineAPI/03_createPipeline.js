@@ -55,10 +55,6 @@ async function createS3Pipeline(token) {
         configuration: {
             destination: secretName
         }
-        // metadataも使う場合はこちらを追加
-        // metadata: {
-        //     destination: secretName
-        // }
     };
 
     console.log('📦 payload 内容:', JSON.stringify(payload, null, 2));
@@ -82,10 +78,13 @@ async function createS3Pipeline(token) {
                 statusText: err.response.statusText,
                 data: err.response.data,
             });
+            throw err;
         } else if (err.request) {
             console.error('❌ Pipeline 作成エラー: No response received', err.request);
+            throw err;
         } else {
             console.error('❌ Pipeline 作成エラー:', err.message);
+            throw err;
         }
     }
 }
