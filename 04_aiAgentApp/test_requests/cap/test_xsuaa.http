@@ -1,8 +1,8 @@
-@xsuaaHostname = https://btp-hackathon-apdkndza.authentication.eu10.hana.ondemand.com
-@btpXsuaaClient = sb-hackathongpt2025!t446172
+@xsuaaHostname = https://XXX.authentication.RRR.hana.ondemand.com
+@btpXsuaaClient = CLIENT
 # 下記Secretはデプロイのたびに変わる
-@btpXsuaaSecret = 54872562-63dd-40d1-8698-7bbed81aa4af$9q5nFuavipRVOXKPiW58K5QmEhJ_E74f-CBs6I4IUuI=
-@btpAppHostname = https://jpdemo-btp-hackathon-apdkndza-prod-hackathongpt2025-srv.cfapps.eu10-004.hana.ondemand.com
+@btpXsuaaSecret = SECRET
+@btpAppHostname = https://XXX.cfapps.RRR.hana.ondemand.com
 
 
 ### GET XSUAA TOKEN
