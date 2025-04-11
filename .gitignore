@@ -1,0 +1,9 @@
+# CAP モジュール
+04_aiAgentApp/cap/node_modules
+04_aiAgentApp/cap/gen
+
+# Pythonモジュール
+04_aiAgentApp/python/venv
+04_aiAgentApp/python/utils/__pycache__
+04_aiAgentApp/python/tool/__pycache__
+04_aiAgentApp/python/repository/__pycache__

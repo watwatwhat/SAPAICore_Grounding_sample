@@ -1,0 +1,56 @@
+{
+  "name": "hackathongpt2025",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@cap-js/hana": "^1",
+    "@sap-cloud-sdk/http-client": "^3.12.0",
+    "@sap-cloud-sdk/resilience": "^3.26.4",
+    "@sap/cds": "^8",
+    "@sap/xssec": "^4",
+    "cap-llm-plugin": "^1.4.5",
+    "cors": "^2.8.5",
+    "express": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/cds-types": "^0.9.0",
+    "@cap-js/sqlite": "^1",
+    "@sap/cds-dk": "^8"
+  },
+  "scripts": {
+    "start": "cds-serve"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "hana"
+      },
+      "auth": {
+        "[development]": {
+          "kind": "dummy",
+          "users": {
+            "*": true
+          }
+        },
+        "[production]": {
+          "kind": "mocked",
+          "users": {
+            "HACKATHONGPT2025APIUSER": {
+              "password": "HACKATHONGPT2025APIPASSWORD"
+            }
+          }
+        }
+      },
+      "destinations": true,
+      "cap-llm-plugin": {
+        "impl": "cap-llm-plugin/srv/cap-llm-plugin.js"
+      }
+    },
+    "sql": {
+      "native_hana_associations": false
+    }
+  }
+}

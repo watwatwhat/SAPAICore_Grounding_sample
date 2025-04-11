@@ -1,0 +1,370 @@
+_schema-version: 3.3.0
+ID: aiagentsample
+version: 1.0.0
+description: "CAP and python."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+ before-all:
+   - builder: custom
+     commands:
+      - npm install --prefix cap
+      - cds build --project cap
+
+modules:
+  - name: aiagentsample-ai-agent-srv
+    type: python
+    path: python
+    parameters:
+      buildpack: python_buildpack
+      disk-quota: 1G
+      memory: 512M
+      command: flask run
+      health-check-type: port
+    properties:
+      FLASK_APP: server.py
+      FLASK_DEBUG: 0
+      FLASK_RUN_HOST: 0.0.0.0
+      FLASK_RUN_PORT: 8080
+      AICORE_RESOURCE_GROUP: default
+      
+    # DB / Destination / XSUAA / AI Core / SAP Cloud Logging をバインド
+    requires:
+      - name: aiagentsample-db
+      - name: aiagentsample-destination
+      - name: aiagentsample-auth
+      - name: aicore
+      - name: otacls
+
+  - name: aiagentsample-srv
+    type: nodejs
+    path: cap/gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+      memory: 256M
+    build-parameters:
+      # builder: npm-ci
+      before-all:
+        - builder: custom
+          commands:
+            - npm install
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    # DB / Destination / XSUAA / AI Core / SAP Cloud Logging  をバインド
+    requires:
+      - name: aiagentsample-db
+      - name: aiagentsample-destination
+      - name: aiagentsample-auth
+      - name: aicore
+      - name: otacls
+
+  - name: aiagentsample-webui
+    type: application
+    path: cap/app/buildapps/app_201388_default_web_1.0.2.zip
+    parameters:
+      buildpack: staticfile_buildpack
+      memory: 512M
+      disk-quota: 512M
+      instances: 1
+      host: aiagentsample-webui-${space}
+
+  # - name: aiagentsample-db-deployer
+  #   type: hdb
+  #   path: cap/gen/db
+  #   parameters:
+  #     buildpack: nodejs_buildpack
+  #   requires:
+  #     - name: aiagentsample-db
+
+resources:
+  # SAP HANA Cloud HDIコンテナ のインスタンス
+  # - name: aiagentsample-db
+  #   type: com.sap.xs.hdi-container
+  #   parameters:
+  #     service: hana
+  #     service-plan: hdi-shared
+  # Destination のインスタンス
+  - name: aiagentsample-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+  # XSUAA のインスタンス
+  - name: aiagentsample-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: aiagentsample
+        tenant-mode: dedicated
+  # SAP HANA Cloud のインスタンス
+  - name: aiagentsample-db
+    type: org.cloudfoundry.existing-service
+  # SAP AI Core のインスタンス
+  - name: aicore
+    type: org.cloudfoundry.existing-service
+  # SAP Cloud Logging のインスタンス
+  - name: otacls
+    type: org.cloudfoundry.existing-service
+
+
+# _schema-version: "3.1"
+# ID: cap-llm-pi-test
+# description: A simple CAP project.
+# version: 1.1.11
+# modules:
+# - name: cap-llm-pi-test-srv
+#   type: nodejs
+#   path: gen/srv
+#   requires:
+#   - name: cap-llm-pi-test-auth
+#   - name: cap-llm-pi-test-db
+#   - name: cap-llm-pi-test-destination-service
+#   provides:
+#   - name: srv-api
+#     properties:
+#       srv-url: ${default-url}
+#   parameters:
+#     buildpack: nodejs_buildpack
+#     disk-quota: 1024M
+#     keep-existing-routes: true
+#     memory: 512M
+#   build-parameters:
+#     builder: npm
+#     ignore:
+#     - .env
+#     - node_modules/
+#     - default-env.json
+# - name: cap-llm-pi-langchain-srv
+#   type: python
+#   path: langchain/
+#   properties:
+#     GREETING: HELLO ENV.VALUE!
+#   requires:
+#   - name: cap-llm-pi-test-auth
+#   - name: cap-llm-pi-test-db
+#   - name: cap-llm-pi-test-destination-service
+#   provides:
+#   - name: langchain-api
+#     properties:
+#       srv-url: ${default-url}
+#   parameters:
+#     buildpack: python_buildpack
+#     disk-quota: 8G
+#     host: cap-llm-pi-langchain-${space}
+#     memory: 4096M
+#   build-parameters:
+#     ignore:
+#     - venv/
+# - name: cap-llm-pi-test-db-deployer
+#   type: hdb
+#   path: gen/db
+#   requires:
+#   - name: cap-llm-pi-test-db
+#   parameters:
+#     buildpack: nodejs_buildpack
+#   build-parameters:
+#     ignore:
+#     - node_modules/
+# - name: cap-llm-pi-test-destination-content
+#   type: com.sap.application.content
+#   requires:
+#   - name: cap-llm-pi-test-destination-service
+#     parameters:
+#       content-target: true
+#   - name: cap-llm-pi-test-repo-host
+#     parameters:
+#       service-key:
+#         name: cap-llm-pi-test-repo-host-key
+#   - name: cap-llm-pi-test-auth
+#     parameters:
+#       service-key:
+#         name: uaa_cap-llm-pi-test-key
+#   parameters:
+#     content:
+#       instance:
+#         destinations:
+#         - Name: cap_llm_pi_test_repo_host
+#           ServiceInstanceName: cap-llm-pi-test-html5-app-host-service
+#           ServiceKeyName: cap-llm-pi-test-repo-host-key
+#           sap.cloud.service: capllmpi.app
+#         - Authentication: OAuth2UserTokenExchange
+#           Name: cap_llm_pi_test
+#           ServiceInstanceName: cap-llm-pi-test-xsuaa-service
+#           ServiceKeyName: uaa_cap-llm-pi-test-key
+#           sap.cloud.service: capllmpi.app
+#         existing_destinations_policy: ignore
+#   build-parameters:
+#     no-source: true
+# - name: cap-llm-pi-test-app-content
+#   type: com.sap.application.content
+#   path: .
+#   requires:
+#   - name: cap-llm-pi-test-repo-host
+#     parameters:
+#       content-target: true
+#   build-parameters:
+#     build-result: resources
+#     requires:
+#     - artifacts:
+#       - capllmpitestui.zip
+#       name: capllmpitestui
+#       target-path: resources/
+#     - artifacts:
+#       - errorlisterrorlist.zip
+#       name: errorlisterrorlist
+#       target-path: resources/
+#     - artifacts:
+#       - tablelisttablelist.zip
+#       name: tablelisttablelist
+#       target-path: resources/
+# - name: capllmpitestui
+#   type: html5
+#   path: app/cap-llm-pi-test-ui
+#   build-parameters:
+#     build-result: dist
+#     builder: custom
+#     commands:
+#     - npm install
+#     - npm run build:cf
+#     supported-platforms: []
+# - name: cap-llm-pi-test-approuter
+#   type: approuter.nodejs
+#   path: app/
+#   requires:
+#   - name: srv-api
+#     group: destinations
+#     properties:
+#       forwardAuthToken: true
+#       name: srv-api
+#       url: ~{srv-url}
+#   - name: cap-llm-pi-test-auth
+#   - name: cap-llm-pi-test-destination-service
+#     group: destinations
+#     properties:
+#       forwardAuthToken: false
+#       name: ui5
+#       url: https://ui5.sap.com
+#   parameters:
+#     disk-quota: 1024M
+#     keep-existing-routes: true
+#     memory: 256M
+#   build-parameters:
+#     ignore:
+#     - .env
+#     - node_modules/
+#     - default-env.json
+# - name: errorlisterrorlist
+#   type: html5
+#   path: app/errorlist
+#   build-parameters:
+#     build-result: dist
+#     builder: custom
+#     commands:
+#     - npm install
+#     - npm run build:cf
+#     supported-platforms: []
+# - name: tablelisttablelist
+#   type: html5
+#   path: app/tablelist
+#   build-parameters:
+#     build-result: dist
+#     builder: custom
+#     commands:
+#     - npm install
+#     - npm run build:cf
+#     supported-platforms: []
+# resources:
+# - name: cap-llm-pi-test-auth
+#   type: org.cloudfoundry.managed-service
+#   parameters:
+#     config:
+#       tenant-mode: dedicated
+#       xsappname: cap-llm-pi-test-${org}-${space}
+#     path: ./xs-security.json
+#     service: xsuaa
+#     service-name: cap-llm-pi-test-xsuaa-service
+#     service-plan: application
+# - name: cap-llm-pi-test-db
+#   type: com.sap.xs.hdi-container
+#   parameters:
+#     service: hana
+#     service-plan: hdi-shared
+# - name: cap-llm-pi-test-repo-host
+#   type: org.cloudfoundry.managed-service
+#   parameters:
+#     service: html5-apps-repo
+#     service-name: cap-llm-pi-test-html5-app-host-service
+#     service-plan: app-host
+# - name: cap-llm-pi-test-destination-service
+#   type: org.cloudfoundry.managed-service
+#   parameters:
+#     config:
+#       HTML5Runtime_enabled: true
+#       init_data:
+#         instance:
+#           destinations:
+#           - Authentication: NoAuthentication
+#             HTML5.DynamicDestination: true
+#             HTML5.ForwardAuthToken: true
+#             HTML5.Timeout: 900000
+#             Name: cap-llm-pi-test-srv
+#             ProxyType: Internet
+#             Type: HTTP
+#             URL: ~{srv-api/srv-url}
+#           - Authentication: OAuth2UserTokenExchange
+#             HTML5.DynamicDestination: true
+#             HTML5.ForwardAuthToken: true
+#             HTML5.Timeout: 900000
+#             Name: cap-llm-pi-langchain-srv
+#             ProxyType: Internet
+#             ServiceInstanceName: cap-llm-pi-test-xsuaa-service
+#             ServiceKeyName: uaa_cap-llm-pi-test-key
+#             Type: HTTP
+#             URL: ~{langchain-api/srv-url}
+#           - Authentication: OAuth2ClientCredentials
+#             HTML5.DynamicDestination: true
+#             HTML5.ForwardAuthToken: true
+#             HTML5.Timeout: 900000
+#             Name: cap-llm-pi-jco-srv
+#             ProxyType: Internet
+#             Type: HTTP
+#             URL: https://kao-jco-rfc-rest-server.cfapps.jp10.hana.ondemand.com
+#             clientId: sb-cap-llm-pi-test-Kao_Corporation_kao-poc-jp10-DEV!t17693
+#             clientSecret: YJoPwfCyZhUASWK8orOph7AxaaU=
+#             tokenServiceURL: https://kao-poc-jp10.authentication.jp10.hana.ondemand.com/oauth/token
+#           - Authentication: NoAuthentication
+#             Name: ui5
+#             ProxyType: Internet
+#             Type: HTTP
+#             URL: https://ui5.sap.com
+#           existing_destinations_policy: update
+#       version: 1.0.0
+#     service: destination
+#     service-name: cap-llm-pi-test-destination-service
+#     service-plan: lite
+#   requires:
+#   - name: srv-api
+#   - name: langchain-api
+#   - name: cap-llm-pi-test-auth
+#     parameters:
+#       service-key:
+#         name: uaa_cap-llm-pi-test-key
+# - name: jco_connectivity
+#   type: org.cloudfoundry.managed-service
+#   parameters:
+#     service: connectivity
+#     service-plan: lite
+# parameters:
+#   deploy_mode: html5-repo
+#   enable-parallel-deployments: true
+# build-parameters:
+#   before-all:
+#   - builder: custom
+#     commands:
+#     - npx cds build --production
