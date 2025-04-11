@@ -1,6 +1,6 @@
-# Hackathon GPT 2025 - In-database Vectorization 検証
+# AI Agent App Sample - In-database Vectorization 検証
 
-本アプリケーションでは、In-database Vectorization の機能を検証しつつ、**Hackathon GPT 2025** の構成を行います。
+本アプリケーションでは、In-database Vectorization の機能を検証しつつ、**AI Agent App Sample** の構成を行います。
 
 ## In-database Vectorization について
 
@@ -28,11 +28,11 @@ CREATE TABLE MY_EMBEDDINGS(
 1. AI Core / Cloud Logging のサービスインスタンスをデプロイ対象のスペースに立ち上げる
     - `aicore`（サービスキーを作成）
     - `otacls`
-    - `hackathongpt2025-db`（SharedDevKey を追加）
+    - `aiagentsample-db`（SharedDevKey を追加）
 
 2. 手動でテーブルを作成する
     - `tables_manual_creation/createTable_QAHISTORY.sql` を使用し、HANA SQL コンソール？を起動
-    - `hackathongpt2025-db(prod)` に接続
+    - `aiagentsample-db(prod)` に接続
         - 表示されない場合には、Build Code画面の左下の`SAP HANA PROJECTS` よりデザインタイムバインドを実行
         - ログインできない場合は、`Connect with Different User` でサービスキーの `hdi_user / hdi_password` を使用して接続
     - SQLを実行する
@@ -47,7 +47,7 @@ CREATE TABLE MY_EMBEDDINGS(
 4. アプリケーションのデプロイ
     ```sh
     mbt build 
-    cf deploy mta_archives/hackathongpt2025_1.0.0.mtar
+    cf deploy mta_archives/aiagentsample_1.0.0.mtar
     ```
 
 5. Destinationを追加する
@@ -122,4 +122,4 @@ connection: close
 
 ---
 
-この README は、In-database Vectorization を活用した **Hackathon GPT 2025** のセットアップ手順を記述したものです。適宜更新しながら運用してください。
+この README は、In-database Vectorization を活用した **AI Agent App Sample** のセットアップ手順を記述したものです。適宜更新しながら運用してください。
