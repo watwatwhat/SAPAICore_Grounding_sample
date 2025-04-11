@@ -1,6 +1,6 @@
-@basicAuthUser = apiUser
-@basicAuthPassword = apiUser
-@btpAppHostname = https://jpdemo-btp-hackathon-apdkndza-prod-hackathongpt2025-ai-1808f92b.cfapps.eu10-004.hana.ondemand.com
+@basicAuthUser = XXX
+@basicAuthPassword = XXX
+@btpAppHostname = https://XXX.cfapps.RRR.hana.ondemand.com
 # @btpAppHostname = http://localhost:5000
 
 ### Chat Endpoint
