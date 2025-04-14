@@ -1,0 +1,27 @@
+#  ========================
+# 
+#  Decralative APIを利用して、プロンプトテンプレートを登録する
+#  https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/create-prompt-template-declarative
+#
+#  ========================
+
+name: simple
+version: 0.0.1
+scenario: my-scenario
+spec:
+  template:
+    - role: "system"
+      content: "{{ ?instruction }}"
+    - role: "user"
+      content: "Some more {{ ?user_input }}"
+  defaults:
+    instruction: "default instruction"
+  additionalFields:
+    isDev: true
+    validations:
+      required: true
+    blockedModels:
+      - name: "gpt-4"
+        versions: "gpt-4-vision"
+      - name: "gpt-4o"
+        versions: "*"

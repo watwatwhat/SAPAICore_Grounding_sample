@@ -1,0 +1,31 @@
+{
+    "cdsc": {
+        "beta": {
+            "vectorType": true
+        }
+    },
+    "requires": {
+        "GENERATIVE_AI_HUB": {
+            "CHAT_MODEL_DESTINATION_NAME": "AICoreAzureOpenAIDestination",
+            "CHAT_MODEL_DEPLOYMENT_URL": "v2/inference/deployments/<デプロイメントID>",
+            "CHAT_MODEL_RESOURCE_GROUP": "default",
+            "CHAT_MODEL_API_VERSION": "2023-05-15",
+            "EMBEDDING_MODEL_DESTINATION_NAME": "AICoreAzureOpenAIDestination",
+            "EMBEDDING_MODEL_DEPLOYMENT_URL": "v2/inference/deployments/<デプロイメントID>",
+            "EMBEDDING_MODEL_RESOURCE_GROUP": "default",
+            "EMBEDDING_MODEL_API_VERSION": "2023-05-15"
+        },
+        "AICoreAzureOpenAIDestination": {
+            "kind": "rest",
+            "credentials": {
+                "destination": "openai-aicore-api",
+                "requestTimeout": "300000"
+            }
+        },
+        "CredentialsForPythonModule": {
+            "endpoint": "<https://<ホスト名>.cfapps.<リージョン>.hana.ondemand.com>",
+            "user": "HACKATHONGPT2025APIUSER",
+            "password": "HACKATHONGPT2025APIPASSWORD"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "template": [
+        {
+            "role": "system",
+            "content": "You classify input text into the two following categories: {{?categories}}"
+        },
+        {
+            "role": "user",
+            "content": "{{?inputExample}}"
+        }
+    ],
+    "defaults": {
+        "categories": "Finance, Tech, Sports"
+    },
+    "additionalFields": {
+        "modelParams": {
+            "temperature": 0.7,
+            "max_tokens": 100
+        },
+        "modelGroup": "chat"
+    }
+}

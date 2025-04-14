@@ -1,0 +1,67 @@
+{
+  "module_configurations": {
+    "grounding_module_config": {
+      "type": "document_grounding_service",
+      "config": {
+        "filters": [
+          {
+            "id": "filter1",
+            "data_repositories": [
+              "<repository ID>"
+            ],
+            "search_config": {
+              "max_chunk_count": 3
+            },
+            "data_repository_type": "vector"
+          }
+        ],
+        "input_params": [
+          "question"
+        ],
+        "output_param": "related_fragments"
+      }
+    },
+    "llm_module_config": {
+      "model_name": "gpt-4o",
+      "model_params": {},
+      "model_version": "2024-05-13"
+    },
+    "templating_module_config": {
+      "template": [
+        {
+          "role": "system",
+          "content": "You are a helpful assistant. \nPlease respond to user's question based on related contexts. \\n\\n\n\nUser's question: {{?question}} \\n \nRelated contexts are as follows: {{?related_fragments}}"
+        }
+      ],
+      "defaults": {}
+    },
+    "filtering_module_config": {
+      "input": {
+        "filters": [
+          {
+            "type": "azure_content_safety",
+            "config": {
+              "Hate": 2,
+              "SelfHarm": 2,
+              "Sexual": 2,
+              "Violence": 2
+            }
+          }
+        ]
+      },
+      "output": {
+        "filters": [
+          {
+            "type": "azure_content_safety",
+            "config": {
+              "Hate": 2,
+              "SelfHarm": 2,
+              "Sexual": 2,
+              "Violence": 2
+            }
+          }
+        ]
+      }
+    }
+  }
+}
