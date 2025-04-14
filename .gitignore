@@ -1,6 +1,8 @@
 # CAP モジュール
 04_aiAgentApp/cap/node_modules
 04_aiAgentApp/cap/gen
+04_aiAgentApp/mta_archives
+04_aiAgentApp/node_modules
 
 # Pythonモジュール
 04_aiAgentApp/python/venv
