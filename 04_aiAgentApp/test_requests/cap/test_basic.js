@@ -1,54 +1,51 @@
-const axios = require('axios');
-const fs = require('fs');
+require('dotenv').config({ path: path.join(__dirname, '../../../04_aiAgentApp/cap/.env') });
+
+const { executeHttpRequest } = require('@sap-cloud-sdk/core');
 const path = require('path');
 const readline = require('readline');
 
-// JSONファイルから認証情報を読み込む
-const credentialsPath = path.join(__dirname, 'credentials', 'ai_agent_variables.json');
-const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8')).cap;
+// Destination名を指定（BTP Cockpitで設定している名前）
+const DESTINATION_NAME = 'aiagentsample-cap-srv';
 
-const { endpoint, user, password } = credentials;
-
-// Basic認証ヘッダーの作成
-const basicAuth = Buffer.from(`${user}:${password}`).toString('base64');
-
-// GETリクエスト関数
-async function testGetQAhistory() {
+// GETリクエスト
+async function callGetFromDestination() {
     try {
-        const response = await axios.get(`${endpoint}/odata/v4/GPT/Qahistory`, {
-            headers: {
-                'Authorization': `Basic ${basicAuth}`,
-                'Accept': 'application/json'
+        const response = await executeHttpRequest(
+            { destinationName: DESTINATION_NAME },
+            {
+                method: 'GET',
+                url: '/odata/v4/GPT/Qahistory'
             }
-        });
+        );
         console.log('✅ GET成功:', response.data);
-    } catch (error) {
-        console.error('❌ GET失敗:', error.response?.data || error.message);
+    } catch (err) {
+        console.error('❌ GET失敗:', err.message);
     }
 }
 
-// POSTリクエスト関数
-async function testPostQAhistory() {
-    const payload = {
-        question: "SAP HANAとは何ですか？",
-        answer: "SAP HANAはインメモリデータベース管理システムです。",
-        metadata: JSON.stringify({ source: "FAQ", created_by: "admin" })
-    };
-
+// POSTリクエスト
+async function callPostToDestination() {
     try {
-        const response = await axios.post(`${endpoint}/odata/v4/GPT/Qahistory`, payload, {
-            headers: {
-                'Authorization': `Basic ${basicAuth}`,
-                'Content-Type': 'application/json; charset=utf-8'
+        const response = await executeHttpRequest(
+            { destinationName: DESTINATION_NAME },
+            {
+                method: 'POST',
+                url: '/odata/v4/GPT/Qahistory',
+                headers: { 'Content-Type': 'application/json' },
+                data: {
+                    question: "SAP HANAとは何ですか？",
+                    answer: "SAP HANAはインメモリデータベース管理システムです。",
+                    metadata: JSON.stringify({ source: "FAQ", created_by: "admin" })
+                }
             }
-        });
+        );
         console.log('✅ POST成功:', response.data);
-    } catch (error) {
-        console.error('❌ POST失敗:', error.response?.data || error.message);
+    } catch (err) {
+        console.error('❌ POST失敗:', err.message);
     }
 }
 
-// ユーザー入力を受け取る関数
+// CLIで操作選択
 function promptUser() {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -57,9 +54,9 @@ function promptUser() {
 
     rl.question("どの操作を実行しますか？（get / post）: ", async (answer) => {
         if (answer.toLowerCase() === 'get') {
-            await testGetQAhistory();
+            await callGetFromDestination();
         } else if (answer.toLowerCase() === 'post') {
-            await testPostQAhistory();
+            await callPostToDestination();
         } else {
             console.log("❗無効な選択です。'get' または 'post' を入力してください。");
         }

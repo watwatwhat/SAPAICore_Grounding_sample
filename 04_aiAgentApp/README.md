@@ -59,6 +59,11 @@ CREATE TABLE MY_EMBEDDINGS(
     - `test_requests/cap/test_basic.http` を使用して `GET/POST` リクエストを試行
     - 既存の`package.json`ではなく、`package_xsuaa.json`を`package.json`に名称変更してデプロイした場合には、XSUAAにより保護されるので、`test_requests/test_xsuaa.http` を使用する。cliend_secretは毎回変わるのでBTP Cockpitとかからコピーしてくる。
     - 返り値のイメージは下記のとおり。
+
+```
+
+```
+
 ```http
 HTTP/1.1 200 OK
 content-length: 1048
