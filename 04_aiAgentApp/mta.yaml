@@ -196,7 +196,6 @@ resources:
               User: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
               Password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
               HTML5.DynamicDestination: true
-              # HTML5.ForwardAuthToken: true
               Name: aiagentsample-cap-srv # CAPサービスをDestinationとして登録
               ProxyType: Internet
               Type: HTTP
@@ -210,7 +209,6 @@ resources:
               User: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
               Password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
               HTML5.DynamicDestination: true
-              # HTML5.ForwardAuthToken: true
               Name: aiagentsample-ai-agent-srv # PythonのAIエージェントサービスをDestinationとして登録
               ProxyType: Internet
               Type: HTTP
