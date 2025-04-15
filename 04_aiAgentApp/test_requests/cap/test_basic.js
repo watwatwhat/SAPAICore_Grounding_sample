@@ -29,8 +29,8 @@ async function callGetFromDestination() {
 // POSTリクエスト
 async function callPostToDestination() {
     try {
-        const response = await executeHttpRequest(
-            { destinationName: DESTINATION_NAME },
+        const capDestination = await getDestination({ destinationName: DESTINATION_NAME });
+        const response = await executeHttpRequest(capDestination,
             {
                 method: 'POST',
                 url: '/odata/v4/GPT/Qahistory',
