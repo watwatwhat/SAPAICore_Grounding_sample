@@ -31,8 +31,6 @@ CREATE TABLE MY_EMBEDDINGS(
 cd 04_aiAgentApp/
 mbt build
 cf deploy mta_archives/aiagentsample_1.0.0.mtar
-
-node manualTasks/01_setup_AICore_AI_API_destination/setup-aicore-destination.js
 ```
 
 1. AI Core / Cloud Logging のサービスインスタンスをデプロイ対象のスペースに立ち上げる
@@ -61,9 +59,12 @@ node manualTasks/01_setup_AICore_AI_API_destination/setup-aicore-destination.js
     ```
 
 5. Destinationを追加する
-    - mtaで紐づいたdestinationインスタンス or サブアカウントに対して、`openai-aicore-api`という名前で、SAP AI CoreのOAuth認証に対応した宛先を作成する。（cap-llm-plugin 用）
-    - [destinationの設定詳細](https://github.com/SAP-samples/cap-llm-plugin-samples/tree/main/samples/hr-approval-rag-usecase)
+    - mtaで紐づいたdestinationインスタンス or サブアカウントに対して、`AICore_AI_API`という名前で、SAP AI CoreのOAuth認証に対応した宛先を作成する。（cap-llm-plugin 用）
     - この際、AI CoreのXSUAAのシークレットは、CAP側にバインドされたシークレットキーである必要がある。デプロイのたびにopenai-aicore-apiデスティネーションのclient_secretは修正が必要。
+    ```bash
+    node manualTasks/01_setup_AICore_AI_API_destination/setup-aicore-destination.js
+    ```
+
 
 5. テストリクエストを送信する
     - `test_requests/cap/test_basic.http` を使用して `GET/POST` リクエストを試行
