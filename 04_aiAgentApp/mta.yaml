@@ -192,11 +192,11 @@ resources:
         init_data:
           instance:
             destinations:
-            - Authentication: Basic
-              username: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
-              password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
+            - Authentication: BasicAuthentication
+              User: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
+              Password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
               HTML5.DynamicDestination: true
-              HTML5.ForwardAuthToken: true
+              # HTML5.ForwardAuthToken: true
               Name: aiagentsample-cap-srv # CAPサービスをDestinationとして登録
               ProxyType: Internet
               Type: HTTP
@@ -206,11 +206,11 @@ resources:
               ProxyType: Internet
               Type: HTTP
               URL: https://ui5.sap.com
-            - Authentication: Basic
-              username: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
-              password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
+            - Authentication: BasicAuthentication
+              User: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
+              Password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
               HTML5.DynamicDestination: true
-              HTML5.ForwardAuthToken: true
+              # HTML5.ForwardAuthToken: true
               Name: aiagentsample-ai-agent-srv # PythonのAIエージェントサービスをDestinationとして登録
               ProxyType: Internet
               Type: HTTP

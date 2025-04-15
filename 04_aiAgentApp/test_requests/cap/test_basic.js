@@ -1,8 +1,10 @@
-const path = require('path'); // ← 先に必要！
+const path = require('path');
 
 require('dotenv').config({ path: path.join(__dirname, '../../../04_aiAgentApp/cap/.env') });
 
 const { executeHttpRequest } = require('@sap-cloud-sdk/core');
+// const { executeHttpRequest } = require("@sap-cloud-sdk/http-client");
+const { getDestination, buildHeadersForDestination } = require("@sap-cloud-sdk/connectivity");
 const readline = require('readline');
 
 // Destination名を指定（BTP Cockpitで設定している名前）
@@ -11,8 +13,8 @@ const DESTINATION_NAME = 'aiagentsample-cap-srv';
 // GETリクエスト
 async function callGetFromDestination() {
     try {
-        const response = await executeHttpRequest(
-            { destinationName: DESTINATION_NAME },
+        const capDestination = await getDestination({ destinationName: DESTINATION_NAME });
+        const response = await executeHttpRequest(capDestination,
             {
                 method: 'GET',
                 url: '/odata/v4/GPT/Qahistory'
