@@ -25,6 +25,16 @@ CREATE TABLE MY_EMBEDDINGS(
 
 ## セットアップ手順
 
+まず、04_aiAgentAppに移動
+
+```bash
+cd 04_aiAgentApp/
+mbt build
+cf deploy mta_archives/aiagentsample_1.0.0.mtar
+
+node manualTasks/01_setup_AICore_AI_API_destination/setup-aicore-destination.js
+```
+
 1. AI Core / Cloud Logging のサービスインスタンスをデプロイ対象のスペースに立ち上げる
     - `default_aicore`（サービスキーを作成）（ブースターで立ち上げていれば不要）
     - `default_logging`

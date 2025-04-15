@@ -18,14 +18,9 @@
         "AICoreAzureOpenAIDestination": {
             "kind": "rest",
             "credentials": {
-                "destination": "openai-aicore-api",
+                "destination": "AICore_AI_API",
                 "requestTimeout": "300000"
             }
-        },
-        "CredentialsForPythonModule": {
-            "endpoint": "<https://<ホスト名>.cfapps.<リージョン>.hana.ondemand.com>",
-            "user": "HACKATHONGPT2025APIUSER",
-            "password": "HACKATHONGPT2025APIPASSWORD"
         }
     }
 }

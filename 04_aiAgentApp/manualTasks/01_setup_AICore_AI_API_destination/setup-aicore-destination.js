@@ -6,10 +6,9 @@ const qs = require('querystring');
 const aicoreServiceInstance = 'default_aicore';
 const aicoreServiceKeyName = 'aicore_service-key';
 const destinationInstance = 'aiagentsample-destination';
-const destinationServiceKeyName = 'key';
-const destinationName = 'aicore-destination';
+const destinationServiceKeyName = 'destination_service-key';
+const destinationName = 'AICore_AI_API';
 
-// === 高機能ロギング関数 ===
 function log(message, type = 'log') {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}]`;
