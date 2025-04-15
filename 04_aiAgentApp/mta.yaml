@@ -131,6 +131,10 @@ modules:
       FLASK_RUN_HOST: 0.0.0.0
       FLASK_RUN_PORT: 8080
       AICORE_RESOURCE_GROUP: default
+    provides:
+      - name: agent-srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
       
     # DB / Destination / XSUAA / AI Core / SAP Cloud Logging をバインド
     requires:
@@ -155,7 +159,7 @@ modules:
     provides:
       - name: srv-api # required by consumers of CAP services (e.g. approuter)
         properties:
-          srv-url: ${default-url}  # このURLはデプロイ後に適切なURLに変わります
+          srv-url: ${default-url}
     # DB / Destination / XSUAA / AI Core / SAP Cloud Logging  をバインド
     requires:
       - name: aiagentsample-db
@@ -183,16 +187,40 @@ resources:
   - name: aiagentsample-destination
     type: org.cloudfoundry.managed-service
     parameters:
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          instance:
+            destinations:
+            - Authentication: Basic
+              username: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
+              password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true
+              Name: aiagentsample-cap-srv # CAPサービスをDestinationとして登録
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{srv-api/srv-url} # CAPサービスのURLを指定
+            - Authentication: NoAuthentication
+              Name: ui5
+              ProxyType: Internet
+              Type: HTTP
+              URL: https://ui5.sap.com
+            - Authentication: Basic
+              username: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
+              password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: true
+              Name: aiagentsample-ai-agent-srv # PythonのAIエージェントサービスをDestinationとして登録
+              ProxyType: Internet
+              Type: HTTP
+              URL: ~{agent-srv-api/srv-url} # PythonのAIエージェントサービスをDestinationとして登録
+            existing_destinations_policy: update
       service: destination
       service-plan: lite
-      destinations:
-        - name: aiagentsample-cap-srv  # CAPサービスをDestinationとして登録
-          url: ~{srv-api/srv-url}      # CAPサービスのURLを指定
-          authentication: Basic    # 認証方法をBasicに変更
-          username: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
-          password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
     requires:
       - name: srv-api
+      - name: agent-srv-api
   # XSUAA のインスタンス
   - name: aiagentsample-auth
     type: org.cloudfoundry.managed-service

@@ -1,7 +1,8 @@
+const path = require('path'); // ← 先に必要！
+
 require('dotenv').config({ path: path.join(__dirname, '../../../04_aiAgentApp/cap/.env') });
 
 const { executeHttpRequest } = require('@sap-cloud-sdk/core');
-const path = require('path');
 const readline = require('readline');
 
 // Destination名を指定（BTP Cockpitで設定している名前）
