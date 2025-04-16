@@ -42,15 +42,24 @@
    ![インスタンス作成完了](assets/README/setup/15_createDB_created.png)
 
 ### 1.3 HDI コンテナの設定
-1. HDI コンテナを作成します
-   ![HDI作成1](assets/README/setup/19_hdi_createHdi_1.png)
-   ![HDI作成2](assets/README/setup/20_hdi_createHdi_2.png)
-   ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png)
-
-2. エンタイトルメントの追加を行います
+1. グローバルアカウントからサブアカウントへのEntitlement付与を行います：
+   - SAP BTP コックピットでグローバルアカウントにログインします
+   - サブアカウントを選択します
+   - "Entitlements" セクションに移動します
+   - "Configure Entitlements" をクリックします
+   - "Add Service Plans" を選択します
+   - 以下のサービスプランを追加します：
+     - SAP HANA Cloud
+     - SAP HANA Schemas & HDI Containers
+   - 変更を保存します
    ![エンタイトルメント追加1](assets/README/setup/16_hdi_addEntitlement_1.png)
    ![エンタイトルメント追加2](assets/README/setup/17_hdi_addEntitlement_2.png)
    ![エンタイトルメント追加3](assets/README/setup/18_hdi_addEntitlement_3.png)
+
+2. HDI コンテナを作成します
+   ![HDI作成1](assets/README/setup/19_hdi_createHdi_1.png)
+   ![HDI作成2](assets/README/setup/20_hdi_createHdi_2.png)
+   ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png)
 
 3. サービスキーを作成します
    ![サービスキー作成](assets/README/setup/22_hdi_createServiceKey.png)
