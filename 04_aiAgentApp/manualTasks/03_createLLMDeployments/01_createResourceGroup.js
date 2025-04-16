@@ -1,29 +1,58 @@
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../../cap/.env') });
-
+const fs = require('fs');
 const axios = require('axios');
 const qs = require('qs');
-const fs = require('fs');
+const { jwtDecode } = require('jwt-decode');
 
-// ユーザー定義変数の読み込み
+require('dotenv').config({ path: path.join(__dirname, '../../cap/.env') });
+
+console.log('📂 Loading user-defined credentials...');
 const userCredsPath = path.join(__dirname, '../../../credentials/user_defined_variable.json');
-const userCreds = JSON.parse(fs.readFileSync(userCredsPath, 'utf8'));
-console.log(`ユーザー定義変数:`);
-console.log(userCreds);
+let userCreds;
+try {
+    userCreds = JSON.parse(fs.readFileSync(userCredsPath, 'utf8'));
+    console.log('✅ Loaded user credentials:', userCreds);
+} catch (e) {
+    console.error('❌ Failed to load user_defined_variable.json:', e.message);
+    process.exit(1);
+}
+
 const resourceGroupId = userCreds.resourceGroupId;
 
 // VCAP_SERVICESからAI Coreの情報を取得
-const vcapServices = JSON.parse(process.env.VCAP_SERVICES);
-const aiCore = vcapServices.aicore[0];
+console.log('📂 Loading VCAP_SERVICES from .env...');
+let vcapServicesRaw = process.env.VCAP_SERVICES;
+console.log('🧾 Raw VCAP_SERVICES (truncated):', vcapServicesRaw?.substring(0, 300) || '(not found)');
+
+let vcapServices;
+try {
+    vcapServices = JSON.parse(vcapServicesRaw);
+    console.log('✅ Parsed VCAP_SERVICES successfully.');
+} catch (e) {
+    console.error('❌ Failed to parse VCAP_SERVICES from .env:', e.message);
+    process.exit(1);
+}
+
+const aiCore = vcapServices.aicore?.[0];
+if (!aiCore) {
+    console.error('❌ aicore service not found in VCAP_SERVICES');
+    process.exit(1);
+}
+
 const creds = aiCore.credentials;
+console.log('🔍 AI Core credentials loaded:');
+console.log(`- xsuaaHostname: ${creds.url}`);
+console.log(`- clientid: ${creds.clientid}`);
+console.log(`- clientsecret: ${'*'.repeat(creds.clientsecret.length)}`); // Masked
+console.log(`- AI_API_URL: ${creds.serviceurls?.AI_API_URL}`);
 
 const xsuaaHostname = creds.url;
 const xsuaaClient = creds.clientid;
 const xsuaaSecret = creds.clientsecret;
 const AI_API_HOST = creds.serviceurls.AI_API_URL;
 
-// アクセストークンの取得
 async function getXsuaaToken() {
+    console.log('🔐 Requesting XSUAA token...');
     const url = `${xsuaaHostname}/oauth/token`;
     const authHeader = Buffer.from(`${xsuaaClient}:${xsuaaSecret}`).toString('base64');
 
@@ -33,20 +62,35 @@ async function getXsuaaToken() {
         client_secret: xsuaaSecret,
     });
 
-    const response = await axios.post(url, data, {
-        headers: {
-            Authorization: `Basic ${authHeader}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-    });
+    try {
+        const response = await axios.post(url, data, {
+            headers: {
+                Authorization: `Basic ${authHeader}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        });
+        const token = response.data.access_token;
+        console.log('✅ Fetched access_token.');
+        console.log('🔑 JWT Access Token (truncated):', token.substring(0, 30) + '...');
 
-    console.log('✅ Fetched access_token!');
-    return response.data.access_token;
+        try {
+            const decoded = jwtDecode(token);
+            console.log('🧬 Decoded JWT (payload):', decoded);
+        } catch (e) {
+            console.warn('⚠️ Failed to decode JWT:', e.message);
+        }
+
+        return token;
+    } catch (err) {
+        console.error('❌ Failed to fetch access_token.');
+        logAxiosError(err);
+        throw err;
+    }
 }
 
-// リソースグループ作成
 async function createResourceGroup(token) {
     const url = `${AI_API_HOST}/v2/admin/resourceGroups`;
+    console.log(`📦 Creating resource group "${resourceGroupId}" at ${url}...`);
 
     const payload = {
         resourceGroupId,
@@ -59,26 +103,27 @@ async function createResourceGroup(token) {
     };
 
     try {
-        await axios.post(url, payload, {
+        const response = await axios.post(url, payload, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
-        console.log('✅ Resource Group created!');
+        console.log('✅ Resource Group created:', response.status, response.data);
     } catch (err) {
-        if (err.response && err.response.status === 409) {
-            console.log('ℹ️ Resource Group already exists');
+        if (err.response?.status === 409) {
+            console.log('ℹ️ Resource Group already exists (409 Conflict).');
         } else {
-            console.error('❌ Failed to create resource group:', err.response?.data || err.message);
+            console.error('❌ Failed to create resource group.');
+            logAxiosError(err);
             throw err;
         }
     }
 }
 
-// 作成後の検証：リソースグループの存在確認
 async function verifyResourceGroup(token) {
     const url = `${AI_API_HOST}/v2/admin/resourceGroups/${resourceGroupId}`;
+    console.log(`🔍 Verifying existence of resource group "${resourceGroupId}" at ${url}...`);
 
     try {
         const response = await axios.get(url, {
@@ -88,31 +133,60 @@ async function verifyResourceGroup(token) {
             },
         });
 
-        if (response.status === 200 && response.data.resourceGroupId === resourceGroupId) {
-            console.log(`✅ Resource Group "${resourceGroupId}" is verified and active.`);
+        const { status, statusText, data } = response;
+        const { resourceGroupId: rgId, status: rgStatus, statusMessage, labels = [] } = data;
+
+        console.log('📨 Full verification response summary:');
+        console.log(`- HTTP Status: ${status} ${statusText}`);
+        console.log(`- Resource Group ID: ${rgId}`);
+        console.log(`- Status: ${rgStatus}`);
+        if (statusMessage) console.log(`- Status Message: ${statusMessage}`);
+        if (labels.length > 0) {
+            console.log(`- Labels:`);
+            labels.forEach((label, index) => {
+                console.log(`    [${index + 1}] ${label.key} = ${label.value}`);
+            });
         } else {
-            console.warn(`⚠️ Resource Group "${resourceGroupId}" response was unexpected:`, response.data);
+            console.log(`- Labels: (none)`);
+        }
+
+        if (status === 200 && rgId === resourceGroupId) {
+            if (rgStatus === 'ACTIVE') {
+                console.log(`✅ Resource Group "${rgId}" is verified and active.`);
+            } else {
+                console.warn(`⚠️ Resource Group "${rgId}" is in non-active state: "${rgStatus}".`);
+                throw new Error(`Resource Group is not ACTIVE: ${rgStatus}`);
+            }
+        } else {
+            throw new Error('Unexpected verification response structure.');
         }
     } catch (err) {
-        console.error(`❌ Resource Group "${resourceGroupId}" could not be verified:`, err.response?.data || err.message);
+        console.error(`❌ Failed to verify resource group "${resourceGroupId}".`);
+        logAxiosError(err);
         throw err;
     }
 }
 
-// 実行
+// 共通エラーログ関数
+function logAxiosError(err) {
+    if (err.response) {
+        console.error(`📛 Response Error: ${err.response.status} ${err.response.statusText}`);
+        console.error('📨 Response data:', err.response.data);
+    } else if (err.request) {
+        console.error('📡 No response received. Request was:', err.request);
+    } else {
+        console.error('🧠 Error setting up request:', err.message);
+    }
+}
+
+// 実行部分
 (async () => {
     try {
-        console.log('🔐 Getting access token...');
         const token = await getXsuaaToken();
-
-        console.log('📦 Creating resource group...');
         await createResourceGroup(token);
-
-        console.log('🔍 Verifying resource group...');
         await verifyResourceGroup(token);
-
         console.log('🎉 All steps completed successfully!');
     } catch (err) {
-        console.error('❌ Error:', err.message);
+        console.error('❌ Execution failed:', err.message);
     }
 })();
