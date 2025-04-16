@@ -1,11 +1,6 @@
 # SAP AI Core ドキュメントグラウンディング
 
-このディレクトリには、SAP AI Coreを使用してドキュメントグラウンディングを設定・実行するためのスクリプト群が含まれています。ドキュメントグラウンディングとは、PDFなどのドキュメントをベクトル化し、それに対して自然言語で検索できるようにする技術です。
-
-SAP AI Core のAPIは現時点で、下記の通りの運用が可能。
-1. Amazon S3をRepositoryとして接続して、pipelineを使って1日1回ベクトル化させる方法 (Pipeline API)
-2. Vector化したいデータをあらかじめチャンク化して、ベクトル化しつつ流し込む方法 (Vector API)
-3. ベクトル化されたデータをもとに、関連するデータを取得する (Retrieval API)
+このディレクトリには、SAP AI Coreを使用してドキュメントグラウンディングを設定・実行するためのスクリプト群が含まれています。ドキュメントグラウンディングとは、生成AIの回答を企業固有の知識やデータに紐づけて信頼性を高める仕組みです。これにより、生成AIの回答を特定のデータに基づいたものにでき、いわゆるハルシネーションを起こりにくくします。
 
 ## 前提条件
 
@@ -32,10 +27,6 @@ SAP AI Core のAPIは現時点で、下記の通りの運用が可能。
 ./00_init.sh
 ```
 
-このスクリプトは以下のパッケージをインストールします：
-- axios - HTTP リクエスト用
-- aws-sdk - Amazon S3 操作用
-
 ### 2. 前提条件の設定
 
 SAP AI CoreとObject Storeの連携を設定します。
@@ -43,11 +34,6 @@ SAP AI CoreとObject Storeの連携を設定します。
 ```bash
 node 01_prerequisites.js
 ```
-
-このスクリプトは以下の処理を行います：
-- SAP AI Coreへのアクセストークンを取得
-- ドキュメントグラウンディング用のリソースグループを作成
-- Amazon S3へのアクセスに必要なシークレットを登録
 
 ### 3. ドキュメントのアップロード
 
@@ -57,11 +43,6 @@ node 01_prerequisites.js
 node 02_uploadDocs.js
 ```
 
-このスクリプトは以下の処理を行います：
-- `docs` ディレクトリから `SAP_BTP_Overview.pdf` を読み込み
-- S3バケットにアップロード
-- 1時間有効な署名付きURLを生成（ブラウザでの確認用）
-
 ### 4. パイプラインの作成
 
 ドキュメントのベクトル化処理を行うパイプラインを作成します。
@@ -69,11 +50,6 @@ node 02_uploadDocs.js
 ```bash
 node 03_createPipeline.js
 ```
-
-このスクリプトは以下の処理を行います：
-- SAP AI Coreへのアクセストークンを取得
-- S3タイプのドキュメントグラウンディングパイプラインを作成
-- 作成されたパイプラインIDを表示
 
 ### 5. パイプラインの管理
 
@@ -144,3 +120,4 @@ node 06_searchRetrieval.js "What is SAP BTP?" <repositoryId>
 - [SAP AI Core - データパイプラインの管理](https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/manage-data-pipelines)
 - [SAP AI Core - リポジトリの取得](https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/get-a-repository)
 - [SAP AI Core - 検索呼び出し](https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/retrieval-search-call)
+- [SAP AI Core - Generative AI Hubの新機能Groundingを解き明かす](https://community.sap.com/t5/technology-blogs-by-sap/sap-ai-core-generative-ai-hub%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BDgrounding%E3%82%92%E8%A7%A3%E3%81%8D%E6%98%8E%E3%81%8B%E3%81%99/ba-p/14065096)
