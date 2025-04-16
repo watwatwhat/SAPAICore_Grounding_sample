@@ -125,7 +125,25 @@
 
 ### 3.1 テーブルの作成とテストデータの投入
 1. HANA Cockpit にログインし、SQLコンソールを開きます
-2. 以下のSQLファイルを順番に実行します：
+2. HDIコンテナに接続します：
+   - Command Paletteを開きます
+     ![Command Paletteを開く](assets/README/setup/49_addDB_openCommandPalette.png)
+   - HDIコンテナを選択します
+     ![HDIコンテナを選択](assets/README/setup/50_addDB_selectHdiContainer.png)
+   - HDIコンテナが接続されたことを確認します
+     ![HDIコンテナ接続完了](assets/README/setup/51_addDB_HdiContainerConnected.png)
+   - SQLファイルを開きます
+     ![SQLファイルを開く](assets/README/setup/52_addDB_openSQLFile.png)
+   - 対象のHDIコンテナを選択します
+     ![対象HDIコンテナを選択](assets/README/setup/53_addDB_targetHdiContainer.png)
+   - 認証情報を取得します
+     ![認証情報を取得](assets/README/setup/54_addDB_getCredentials.png)
+   - 認証情報を入力します
+     ![認証情報を入力](assets/README/setup/55_addDB_inputCredentials.png)
+   - DBへの接続が成功したことを確認します
+     ![DB接続成功](assets/README/setup/56_addDB_successfulConnectionToDB.png)
+
+3. 以下のSQLファイルを順番に実行します：
    ```bash
    # テーブル作成
    cat manualTasks/01_tables_manual_creation/createTable_QAHISTORY.sql | hdbsql -i <instance_number> -d <database_name> -u <username> -p <password>
