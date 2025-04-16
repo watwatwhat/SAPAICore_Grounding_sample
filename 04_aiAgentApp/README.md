@@ -44,14 +44,13 @@
 ### 1.3 HDI コンテナの設定
 1. グローバルアカウントからサブアカウントへのEntitlement付与を行います：
    - SAP BTP コックピットでグローバルアカウントにログインします
-   - サブアカウントを選択します
-   - "Entitlements" セクションに移動します
-   - "Configure Entitlements" をクリックします
-   - "Add Service Plans" を選択します
+   - "権限 -> エンティティ割り当て" セクションに移動し、サブアカウントを選択します
+   - "編集" をクリックします
+   - "サービスプランを追加" を選択します
    - 以下のサービスプランを追加します：
-     - SAP HANA Cloud
      - SAP HANA Schemas & HDI Containers
    - 変更を保存します
+   - 変更が保存されるまで待機します
    ![エンタイトルメント追加1](assets/README/setup/16_hdi_addEntitlement_1.png)
    ![エンタイトルメント追加2](assets/README/setup/17_hdi_addEntitlement_2.png)
    ![エンタイトルメント追加3](assets/README/setup/18_hdi_addEntitlement_3.png)
