@@ -58,11 +58,11 @@
 2. HDI コンテナを作成します
    ![HDI作成1](assets/README/setup/19_hdi_createHdi_1.png)
    ![HDI作成2](assets/README/setup/20_hdi_createHdi_2.png)
-   ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png)
+   <!-- ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png) -->
 
-3. サービスキーを作成します
+<!-- 3. サービスキーを作成します
    ![サービスキー作成](assets/README/setup/22_hdi_createServiceKey.png)
-   ![サービスキー作成完了](assets/README/setup/23_hdi_createdServiceKey.png)
+   ![サービスキー作成完了](assets/README/setup/23_hdi_createdServiceKey.png) -->
 
 ## 2. アプリケーションのデプロイ
 
