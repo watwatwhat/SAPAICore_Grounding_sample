@@ -102,10 +102,19 @@
    - 実行状態を確認します
      ![実行状態を確認](assets/README/setup/32_addHanaTools_checkRunningState.png)
 
-3. Cloud Foundry にログインします
+3. SAP Cloud Loggingのインスタンスを作成します：
+   - SAP BTP コックピットでインスタンス作成画面を開きます
+   - インスタンス名を入力します
+     ![インスタンス名を入力](assets/README/setup/43_createLoggingInstance_nameInstance.png)
+   - インスタンスを作成します
+     ![インスタンスを作成](assets/README/setup/42_createLoggingInstance_create.png)
+   - インスタンスが作成されたことを確認します
+     ![インスタンス作成完了](assets/README/setup/44_createLoggingInstance_instanceCreated.png)
+
+4. Cloud Foundry にログインします
    ![Cloud Foundry ログイン](assets/README/setup/25_deployApp_cfLogin.png)
 
-4. API エンドポイントを取得します
+5. API エンドポイントを取得します
    ![APIエンドポイント取得](assets/README/setup/24_deployApp_getAPIEndpoint.png)
 
 ### 2.2 アプリケーションのビルドとデプロイ
