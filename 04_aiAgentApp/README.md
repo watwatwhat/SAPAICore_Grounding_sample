@@ -1,141 +1,132 @@
-# AI Agent App Sample - In-database Vectorization 検証
+# SAP AI Core Grounding サンプルアプリケーション セットアップ手順
 
-本アプリケーションでは、In-database Vectorization の機能を検証しつつ、**AI Agent App Sample** の構成を行います。
+## 1. HANA Cloud セットアップ
 
-## In-database Vectorization について
+### 1.1 HANA Cloud Booster の実行
+1. SAP BTP コックピットにログインし、HANA Cloud Booster を検索します
+   ![HANA Cloud Booster 検索](assets/README/setup/01_booster_searchBoosterForHANACloud.png)
 
-以下のようにテーブルを作成することで、`PARAGRAPH` カラムに挿入されたデータが、自動的に `SAP_NEB.20240715` によりベクトル化され、`EMBEDDING` カラムに挿入されます。
+2. "HANA Cloud のセットアップ" シナリオを選択します
+   ![シナリオ選択](assets/README/setup/02_booster_selectScenario.png)
 
-例）
+3. サブアカウントを選択します
+   ![サブアカウント選択](assets/README/setup/03_booster_selectSubaccount.png)
 
-```sql
-CREATE TABLE MY_EMBEDDINGS(
-    TITLE NVARCHAR(100),
-    PARAGRAPH_ID INT,
-    PARAGRAPH NVARCHAR(5000),
-    EMBEDDING REAL_VECTOR GENERATED ALWAYS AS
-    VECTOR_EMBEDDING(PARAGRAPH, 'DOCUMENT', 'SAP_NEB.20240715')
-);
-```
+4. ユーザーを指定します
+   ![ユーザー指定](assets/README/setup/04_booster_designateUser.png)
 
-[VECTOR_EMBEDDING Function (Vector)](https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-vector-engine-guide/vector-embedding-function-vector)
+### 1.2 HANA Cloud インスタンスの作成
+1. HANA Cockpit を起動します
+   ![HANA Cockpit 起動](assets/README/setup/05_cockpit_launchHANACockpit.png)
 
-しかし、SAP CAP のスキーマ定義から MTA の仕組みを用いて動的にこのテーブルを HANA Cloud にデプロイすることは現状ではできません。
-そのため、以下の手順で回避を試みます。
+2. Cloud Foundry にログインします
+   ![Cloud Foundry ログイン](assets/README/setup/07_createDB_loginToCF.png)
 
-## セットアップ手順
+3. スペースを選択します
+   ![スペース選択](assets/README/setup/08_createDB_selectSpace.png)
 
-まず、04_aiAgentAppに移動
+4. 以下の設定で HANA Cloud インスタンスを作成します：
+   - 一般設定
+     ![一般設定](assets/README/setup/09_createDB_generalSetting.png)
+   - スペック設定
+     ![スペック設定](assets/README/setup/10_createDB_specSetting.png)
+   - アベイラビリティーゾーンの選択
+     ![AZ選択](assets/README/setup/11_createDB_selectAZ.png)
+   - NLP 機能の有効化
+     ![NLP有効化](assets/README/setup/12_createDB_enableNLP.png)
+   - インスタンスマッピングの設定
+     ![インスタンスマッピング](assets/README/setup/13_createDB_instanceMapping.png)
 
-```bash
-cd 04_aiAgentApp/
-mbt build
-cf deploy mta_archives/aiagentsample_1.0.0.mtar
-```
+5. インスタンス作成を実行します
+   ![インスタンス作成実行](assets/README/setup/14_createDB_executeCreation.png)
+   ![インスタンス作成完了](assets/README/setup/15_createDB_created.png)
 
-1. AI Core / Cloud Logging のサービスインスタンスをデプロイ対象のスペースに立ち上げる
-    - `default_aicore`（サービスキーを作成）（ブースターで立ち上げていれば不要）
-    - `default_logging`
-    - `aiagentsample-db`（SharedDevKey を追加）
+### 1.3 HDI コンテナの設定
+1. HDI コンテナを作成します
+   ![HDI作成1](assets/README/setup/19_hdi_createHdi_1.png)
+   ![HDI作成2](assets/README/setup/20_hdi_createHdi_2.png)
+   ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png)
 
-2. 手動でテーブルを作成する
-    - `tables_manual_creation/createTable_QAHISTORY.sql` を使用し、HANA SQL コンソール？を起動
-    - `aiagentsample-db(prod)` に接続
-        - 表示されない場合には、Build Code画面の左下の`SAP HANA PROJECTS` よりデザインタイムバインドを実行
-        - ログインできない場合は、`Connect with Different User` でサービスキーの `hdi_user / hdi_password` を使用して接続
-    - SQLを実行する
+2. エンタイトルメントの追加を行います
+   ![エンタイトルメント追加1](assets/README/setup/16_hdi_addEntitlement_1.png)
+   ![エンタイトルメント追加2](assets/README/setup/17_hdi_addEntitlement_2.png)
+   ![エンタイトルメント追加3](assets/README/setup/18_hdi_addEntitlement_3.png)
 
-![SQLconsole_createTable](assets/README/SQLconsole_createTable.png)
+3. サービスキーを作成します
+   ![サービスキー作成](assets/README/setup/22_hdi_createServiceKey.png)
+   ![サービスキー作成完了](assets/README/setup/23_hdi_createdServiceKey.png)
 
-3. サンプルデータをSQLから追加する
-    - `tables_manual_creation/insertTestData_QAHISTORY.sql` を使用し、HANA SQL コンソール？を起動
-    - SQLを実行する
-    - 適宜、SAP HANA Cloud Database Explorerからデータを確認する
+## 2. アプリケーションのデプロイ
 
-4. アプリケーションのデプロイ
-    ```sh
-    mbt build 
-    cf deploy mta_archives/aiagentsample_1.0.0.mtar
-    ```
+### 2.1 デプロイ前の準備
+1. Cloud Foundry にログインします
+   ![Cloud Foundry ログイン](assets/README/setup/25_deployApp_cfLogin.png)
 
-5. Destinationを追加する
-    - mtaで紐づいたdestinationインスタンス or サブアカウントに対して、`AICore_AI_API`という名前で、SAP AI CoreのOAuth認証に対応した宛先を作成する。（cap-llm-plugin 用）
-    - この際、AI CoreのXSUAAのシークレットは、CAP側にバインドされたシークレットキーである必要がある。デプロイのたびにopenai-aicore-apiデスティネーションのclient_secretは修正が必要。
-    ```bash
-    node manualTasks/01_setup_AICore_AI_API_destination/setup-aicore-destination.js
-    ```
+2. API エンドポイントを取得します
+   ![APIエンドポイント取得](assets/README/setup/24_deployApp_getAPIEndpoint.png)
 
+### 2.2 アプリケーションのビルドとデプロイ
+1. アプリケーションをビルドし、デプロイします
+   ![アプリケーションのビルドとデプロイ](assets/README/setup/26_deployApp_buildAndDeploy.png)
 
-5. テストリクエストを送信する
-    - `test_requests/cap/test_basic.http` を使用して `GET/POST` リクエストを試行
-    - 既存の`package.json`ではなく、`package_xsuaa.json`を`package.json`に名称変更してデプロイした場合には、XSUAAにより保護されるので、`test_requests/test_xsuaa.http` を使用する。cliend_secretは毎回変わるのでBTP Cockpitとかからコピーしてくる。
-    - 返り値のイメージは下記のとおり。
+## 3. 手動タスクの実行
 
-```
+### 3.1 テーブルの作成とテストデータの投入
+1. HANA Cockpit にログインし、SQLコンソールを開きます
+2. 以下のSQLファイルを順番に実行します：
+   ```bash
+   # テーブル作成
+   cat manualTasks/01_tables_manual_creation/createTable_QAHISTORY.sql | hdbsql -i <instance_number> -d <database_name> -u <username> -p <password>
 
-```
+   # テストデータ投入
+   cat manualTasks/01_tables_manual_creation/insertTestData_QAHISTORY.sql | hdbsql -i <instance_number> -d <database_name> -u <username> -p <password>
+   ```
 
-```http
-HTTP/1.1 200 OK
-content-length: 1048
-content-type: application/json; charset=utf-8
-date: Wed, 19 Mar 2025 07:43:00 GMT
-odata-version: 4.0
-x-correlation-id: 02a7dbc0-dad3-49dd-503a-6b409557f52b
-x-powered-by: Express
-x-vcap-request-id: 02a7dbc0-dad3-49dd-503a-6b409557f52b
-strict-transport-security: max-age=31536000; includeSubDomains; preload;
-connection: close
+### 3.2 AI Core と AI API のデスティネーション設定
+1. Node.js がインストールされていることを確認します
+2. 以下のコマンドを実行してデスティネーションを設定します：
+   ```bash
+   cd manualTasks/02_setup_AICore_AI_API_destination
+   npm install
+   node setup-aicore-destination.js
+   ```
 
-{
-  "@odata.context": "$metadata#Qahistory",
-  "value": [
-    {
-      "ID": "7B8A001004A6CC5A1900AE3E2486A868",
-      "answer": "SAP HANAは高速なデータ処理が可能で、リアルタイム分析を提供します。",
-      "createdAt": "2025-03-19T06:08:42.050Z",
-      "createdBy": null,
-      "mergedqa": "Q: SAP HANAの主な特徴は？ A: SAP HANAは高速なデータ処理が可能で、リアルタイム分析を提供します。",
-      "metadata": "{\"source\": \"UserQuery\", \"created_by\": \"user123\"}",
-      "modifiedAt": "2025-03-19T06:08:42.050Z",
-      "modifiedBy": null,
-      "question": "SAP HANAの主な特徴は？"
-    }
-  ]
-}
-```
+### 3.3 テストリクエストの実行
 
-```http
-HTTP/1.1 201 Created
-content-length: 523
-content-type: application/json; charset=utf-8
-date: Wed, 19 Mar 2025 07:42:10 GMT
-location: Qahistory(85eb829d-6dd0-4c72-bdbb-1e0e55b618d9)
-odata-version: 4.0
-x-correlation-id: 20348f64-7dc5-41b5-4754-e761b3b97d7f
-x-powered-by: Express
-x-vcap-request-id: 20348f64-7dc5-41b5-4754-e761b3b97d7f
-strict-transport-security: max-age=31536000; includeSubDomains; preload;
-connection: close
+#### Pythonモジュール用のテストリクエスト
+1. Node.js がインストールされていることを確認します
+2. テストスクリプトのディレクトリに移動します：
+   ```bash
+   cd manualTasks/03_test_requests/python
+   ```
+3. 必要なパッケージをインストールします：
+   ```bash
+   npm install
+   ```
+4. テストスクリプトを実行します：
+   ```bash
+   node test.js
+   ```
 
-{
-  "@odata.context": "$metadata#Qahistory/$entity",
-  "ID": "85eb829d-6dd0-4c72-bdbb-1e0e55b618d9",
-  "answer": "SAP HANAはインメモリデータベース管理システムです。",
-  "createdAt": "2025-03-19T07:42:08.566Z",
-  "createdBy": "system",
-  "mergedqa": "Q: SAP HANAとは何ですか？ A: SAP HANAはインメモリデータベース管理システムです。",
-  "metadata": "{\"source\": \"FAQ\", \"created_by\": \"admin\"}",
-  "modifiedAt": "2025-03-19T07:42:08.566Z",
-  "modifiedBy": "system",
-  "question": "SAP HANAとは何ですか？"
-}
-```
+#### CAPアプリケーション用のテストリクエスト
+1. Node.js がインストールされていることを確認します
+2. テストスクリプトのディレクトリに移動します：
+   ```bash
+   cd manualTasks/03_test_requests/cap
+   ```
+3. 必要なパッケージをインストールします：
+   ```bash
+   npm install
+   ```
+4. テストスクリプトを実行します：
+   ```bash
+   node test.js
+   ```
 
-結果は下記の通りで、自動的にEmbeddingが実行される
-
-![AutoEmbed](assets/README/autoEmbed.png)
-
----
-
-この README は、In-database Vectorization を活用した **AI Agent App Sample** のセットアップ手順を記述したものです。適宜更新しながら運用してください。
+## 注意事項
+- セットアップには SAP BTP の適切な権限が必要です
+- リソースの作成には時間がかかる場合があります
+- 各ステップで問題が発生した場合は、画像を参照して設定を確認してください
+- 手動タスクの実行前に、必要なツール（Node.js）がインストールされていることを確認してください
+- SQLファイルの実行時は、適切なデータベース接続情報を指定してください
+- テストリクエストは、Pythonモジュール用またはCAPアプリケーション用のいずれかの方法で実行できます
