@@ -143,14 +143,20 @@
    - DBへの接続が成功したことを確認します
      ![DB接続成功](assets/README/setup/56_addDB_successfulConnectionToDB.png)
 
-3. 以下のSQLファイルを順番に実行します：
-   ```bash
-   # テーブル作成
-   cat manualTasks/01_tables_manual_creation/createTable_QAHISTORY.sql | hdbsql -i <instance_number> -d <database_name> -u <username> -p <password>
+3. テーブルを作成します：
+   - テーブル作成SQLを実行します
+     ![テーブル作成](assets/README/setup/57_createTable.png)
+   - テーブルが作成されたことを確認します
 
-   # テストデータ投入
-   cat manualTasks/01_tables_manual_creation/insertTestData_QAHISTORY.sql | hdbsql -i <instance_number> -d <database_name> -u <username> -p <password>
-   ```
+4. サンプルデータを投入します：
+   - サンプルデータ投入SQLを実行します
+     ![サンプルデータ投入](assets/README/setup/59_insertSampleData.png)
+   - データが投入されたことを確認します
+
+5. 必要に応じてテーブルを削除します：
+   - テーブル削除SQLを実行します
+     ![テーブル削除](assets/README/setup/58_dropTable.png)
+   - テーブルが削除されたことを確認します
 
 ### 3.2 AI Core と AI API のデスティネーション設定
 1. Node.js がインストールされていることを確認します
@@ -209,7 +215,10 @@
 5. テストスクリプトを実行します：
    ```bash
    node test.js
+   どの操作を実行しますか？（get / post）: get
    ```
+6. GETリクエストのテスト結果を確認します：
+   ![GETリクエストテスト結果](assets/README/setup/60_test_getData.png)
 
 ## 注意事項
 - セットアップには SAP BTP の適切な権限が必要です
