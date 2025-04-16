@@ -162,9 +162,9 @@
 1. Node.js がインストールされていることを確認します
 2. 以下のコマンドを実行してデスティネーションを設定します：
    ```bash
-   cd manualTasks/02_setup_AICore_AI_API_destination
+   cd manualTasks
    npm install
-   node setup-aicore-destination.js
+   node 02_setup_AICore_AI_API_destination/setup-aicore-destination.js
    ```
 
 3. AI Coreインスタンスをバインドします：
@@ -177,66 +177,46 @@
 
 4. LLMデプロイメントを作成します：
    ```bash
-   cd manualTasks/03_createLLMDeployments
-   npm install
    # リソースグループを作成
-   node 01_createResourceGroup.js
+   node 03_createLLMDeployments/01_createResourceGroup.js
    # デプロイメントを作成
-   node 02_createDeployments.js
+   node 03_createLLMDeployments/02_createDeployments.js
    ```
 
 ### 3.3 テストリクエストの実行
 
-#### Pythonモジュール用のテストリクエスト
-1. Node.js がインストールされていることを確認します
-2. テストスクリプトのディレクトリに移動します：
-   ```bash
-   cd manualTasks/03_test_requests/python
-   ```
-3. 必要なパッケージをインストールします：
-   ```bash
-   npm install
-   ```
-4. Destinationインスタンスをバインドします：
-   - Destination Selectorを開きます
-     ![Destination Selectorを開く](assets/README/setup/45_test_cap_bindDestination_openSelector.png)
-   - ディレクトリを選択します
-     ![ディレクトリを選択](assets/README/setup/46_test_cap_bindDestination_selectDir.png)
-   - インスタンスを選択します
-     ![インスタンスを選択](assets/README/setup/47_test_cap_bindDestination_selectInstance.png)
-   - 環境が作成されたことを確認します
-     ![環境作成完了](assets/README/setup/48_test_cap_bindDestination_createdEnv.png)
-5. テストスクリプトを実行します：
-   ```bash
-   node test.js
-   ```
-
 #### CAPアプリケーション用のテストリクエスト
 1. Node.js がインストールされていることを確認します
-2. テストスクリプトのディレクトリに移動します：
-   ```bash
-   cd manualTasks/03_test_requests/cap
-   ```
-3. 必要なパッケージをインストールします：
-   ```bash
-   npm install
-   ```
-4. Destinationインスタンスをバインドします：
-   - Destination Selectorを開きます
-     ![Destination Selectorを開く](assets/README/setup/45_test_cap_bindDestination_openSelector.png)
-   - ディレクトリを選択します
-     ![ディレクトリを選択](assets/README/setup/46_test_cap_bindDestination_selectDir.png)
-   - インスタンスを選択します
-     ![インスタンスを選択](assets/README/setup/47_test_cap_bindDestination_selectInstance.png)
-   - 環境が作成されたことを確認します
-     ![環境作成完了](assets/README/setup/48_test_cap_bindDestination_createdEnv.png)
-5. テストスクリプトを実行します：
-   ```bash
-   node test.js
-   どの操作を実行しますか？（get / post）: get
-   ```
-6. GETリクエストのテスト結果を確認します：
+2. GET用のテストスクリプトを実行します：
+    ```bash
+    node 03_test_requests/cap/test.js
+    どの操作を実行しますか？（get / post）: get
+    ```
+   
+3. GETリクエストのテスト結果を確認します：
    ![GETリクエストテスト結果](assets/README/setup/60_test_getData.png)
+
+4. POST用のテストスクリプトを実行します：
+    ```bash
+    node 03_test_requests/cap/test.js
+    どの操作を実行しますか？（get / post）: post
+    ```
+   
+5. POSTリクエストのテスト結果を確認します：
+
+
+
+#### Pythonモジュール用のテストリクエスト
+1. Node.js がインストールされていることを確認します
+2. テストスクリプトを実行します：
+   ```bash
+   node 03_test_requests/python/test.js
+   ```
+   どの操作を実行しますか？（get / post）: get
+
+3. GETリクエストのテスト結果を確認します：
+   ![GETリクエストテスト結果](assets/README/setup/60_test_getData.png)
+   
 
 ## 注意事項
 - セットアップには SAP BTP の適切な権限が必要です
