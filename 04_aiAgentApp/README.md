@@ -68,10 +68,44 @@
 ## 2. アプリケーションのデプロイ
 
 ### 2.1 デプロイ前の準備
-1. Cloud Foundry にログインします
+1. ワークスペースを作成します：
+   - "Create Workspace" をクリックします
+     ![ワークスペース作成](assets/README/setup/33_createWorkSpace_clickCreate.png)
+   - "App Development" を選択します
+     ![App Developmentを選択](assets/README/setup/34_createWorkSpace_selectAppDevelopment.png)
+   - "Build Code" を選択します
+     ![Build Codeを選択](assets/README/setup/35_createWorkSpace_selectBuildCode.png)
+   - "Full Stack" を選択します
+     ![Full Stackを選択](assets/README/setup/36_createWorkSpace_selectFullStack.png)
+   - 詳細情報を入力します
+     ![詳細情報を入力](assets/README/setup/37_createWorkSpace_inputDetails.png)
+   - "Get Started" をクリックします
+     ![Get Startedをクリック](assets/README/setup/38_createWorkSpace_GetStarted.png)
+   - Gitからクローンします
+     ![Gitからクローン](assets/README/setup/39_createWorkSpace_CloneFromGit.png)
+   - プロジェクトがクローンされたことを確認します
+     ![プロジェクトクローン完了](assets/README/setup/40_createWorkSpace_clonedProject.png)
+   - ターミナルを開き、プロジェクトディレクトリに移動します
+     ![ターミナルを開く](assets/README/setup/41_createWorkSpace_openTerminalAndGoToProjectDir.png)
+
+2. DevSpaceにHANA Toolsを追加します：
+   - DevSpace Managerを開きます
+     ![DevSpace Managerを開く](assets/README/setup/27_addHanaTools_openDevSpaceManager.png)
+   - 実行中のDevSpaceを停止します
+     ![DevSpaceを停止](assets/README/setup/28_addHanaTools_stopDevSpace.png)
+   - Settingsを開きます
+     ![Settingsを開く](assets/README/setup/29_addHanaTools_openSettings.png)
+   - HANA Toolsを選択します
+     ![HANA Toolsを選択](assets/README/setup/30_addHanaTools_selectHanaTools.png)
+   - DevSpaceを再起動します
+     ![DevSpaceを起動](assets/README/setup/31_addHanaTools_startDevSpace.png)
+   - 実行状態を確認します
+     ![実行状態を確認](assets/README/setup/32_addHanaTools_checkRunningState.png)
+
+3. Cloud Foundry にログインします
    ![Cloud Foundry ログイン](assets/README/setup/25_deployApp_cfLogin.png)
 
-2. API エンドポイントを取得します
+4. API エンドポイントを取得します
    ![APIエンドポイント取得](assets/README/setup/24_deployApp_getAPIEndpoint.png)
 
 ### 2.2 アプリケーションのビルドとデプロイ
