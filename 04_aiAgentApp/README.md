@@ -153,7 +153,25 @@
      ![サンプルデータ投入](assets/README/setup/59_insertSampleData.png)
    - データが投入されたことを確認します
 
-5. 必要に応じてテーブルを削除します：
+5. SAP HANA Database Explorerでデータを確認します：
+   - SAP HANA Centralを開きます
+     ![HANA Centralを開く](assets/README/setup/70_DBX_openHANACentral.png)
+   - Database Explorerを開きます
+     ![Database Explorerを開く](assets/README/setup/71_DBX_openDatabaseExplorer.png)
+   - ログインします
+     ![ログイン](assets/README/setup/72_DBX_logon.png)
+   - HDIコンテナを追加します
+     ![HDIコンテナ追加](assets/README/setup/73_DBX_addHDIContainer.png)
+   - サービスキーを取得します
+     ![サービスキー取得](assets/README/setup/74_DBX_getSK.png)
+   - サービスキーを設定します
+     ![サービスキー設定](assets/README/setup/75_DBX_setSK.png)
+   - データを開きます
+     ![データを開く](assets/README/setup/76_DBX_openData.png)
+   - サンプルデータを表示します
+     ![サンプルデータ表示](assets/README/setup/77_DBX_viewSampleData.png)
+
+6. 必要に応じてテーブルを削除します：
    - テーブル削除SQLを実行します
      ![テーブル削除](assets/README/setup/58_dropTable.png)
    - テーブルが削除されたことを確認します
