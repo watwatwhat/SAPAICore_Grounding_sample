@@ -155,7 +155,16 @@
    ```bash
    npm install
    ```
-4. テストスクリプトを実行します：
+4. Destinationインスタンスをバインドします：
+   - Destination Selectorを開きます
+     ![Destination Selectorを開く](assets/README/setup/45_test_cap_bindDestination_openSelector.png)
+   - ディレクトリを選択します
+     ![ディレクトリを選択](assets/README/setup/46_test_cap_bindDestination_selectDir.png)
+   - インスタンスを選択します
+     ![インスタンスを選択](assets/README/setup/47_test_cap_bindDestination_selectInstance.png)
+   - 環境が作成されたことを確認します
+     ![環境作成完了](assets/README/setup/48_test_cap_bindDestination_createdEnv.png)
+5. テストスクリプトを実行します：
    ```bash
    node test.js
    ```
@@ -170,7 +179,16 @@
    ```bash
    npm install
    ```
-4. テストスクリプトを実行します：
+4. Destinationインスタンスをバインドします：
+   - Destination Selectorを開きます
+     ![Destination Selectorを開く](assets/README/setup/45_test_cap_bindDestination_openSelector.png)
+   - ディレクトリを選択します
+     ![ディレクトリを選択](assets/README/setup/46_test_cap_bindDestination_selectDir.png)
+   - インスタンスを選択します
+     ![インスタンスを選択](assets/README/setup/47_test_cap_bindDestination_selectInstance.png)
+   - 環境が作成されたことを確認します
+     ![環境作成完了](assets/README/setup/48_test_cap_bindDestination_createdEnv.png)
+5. テストスクリプトを実行します：
    ```bash
    node test.js
    ```

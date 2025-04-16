@@ -1,5 +1,5 @@
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../../../04_aiAgentApp/cap/.env') });
+require('dotenv').config({ path: path.join(__dirname, '../../../python/.env') });
 
 const { executeHttpRequest } = require('@sap-cloud-sdk/core');
 const { getDestination } = require('@sap-cloud-sdk/connectivity');
