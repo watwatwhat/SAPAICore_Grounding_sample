@@ -179,9 +179,23 @@
    ```bash
    # リソースグループを作成
    node 03_createLLMDeployments/01_createResourceGroup.js
+   ```
+   リソースグループが作成されたことを確認します：
+   ![リソースグループ作成](assets/README/setup/64_createResourceGroup.png)
+
+   ```bash
    # デプロイメントを作成
    node 03_createLLMDeployments/02_createDeployments.js
    ```
+
+5. SAP AI LaunchpadとSAP AI Coreのインスタンスを紐付けます：
+   - SAP AI Launchpadにログインします
+   - インスタンスの紐付け画面を開きます
+     ![インスタンス紐付け画面](assets/README/setup/67_launchpadConfig_getSK.png)
+   - SAP AI Coreのインスタンスを選択します
+     ![インスタンス選択](assets/README/setup/68_launchpadConfig_openAILaunchpad.png)
+   - 紐付けが完了したことを確認します
+     ![紐付け完了](assets/README/setup/69_launchpadConfig_uploadSK.png)
 
 ### 3.3 テストリクエストの実行
 

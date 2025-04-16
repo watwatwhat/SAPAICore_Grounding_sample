@@ -9,7 +9,7 @@ const fs = require('fs');
 // ユーザー指定の変数（そのままでOK）
 const userCredsPath= path.join(__dirname, '../../../credentials/user_defined_variable.json');
 const userCreds = JSON.parse(fs.readFileSync(userCredsPath, 'utf8'));
-console.log(`ユーザー定義変数：${userCreds}`);
+console.log(`ユーザー定義変数：${JSON.stringify(userCreds)}`);
 const resourceGroupId = userCreds.resourceGroupId;
 
 
