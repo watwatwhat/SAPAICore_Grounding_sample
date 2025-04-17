@@ -225,10 +225,10 @@ async function waitForDeployment(token, deploymentId) {
       for (const model of models) {
         let confKey = "";
         let depKey = "";
-        if(model.type== "chat") {
+        if(model.type == "chat") {
           confKey = `chatModel_configurationId`;
           depKey = `chatModel_deploymentId`;
-        } else if (model.type== "embedding") {
+        } else if (model.type == "embedding") {
           confKey = `embeddingModel_configurationId`;
           depKey = `embeddingModel_deploymentId`;
         }
