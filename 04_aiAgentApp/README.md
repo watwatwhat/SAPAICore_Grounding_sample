@@ -57,6 +57,7 @@
 
 2. HDI コンテナを作成します
    ![HDI作成1](assets/README/setup/19_hdi_createHdi_1.png)
+   - **この際、「aiagentsample-deepdiveXXX-db」という名前に対して、自分のIDをXXXに代入した値を入力してください。**
    ![HDI作成2](assets/README/setup/20_hdi_createHdi_2.png)
    <!-- ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png) -->
 
