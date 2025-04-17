@@ -7,7 +7,7 @@ const { getDestination } = require("@sap-cloud-sdk/connectivity");
 const readline = require('readline');
 
 // Destination名を指定（BTP Cockpitで設定している名前）
-const DESTINATION_NAME = 'aiagentsample-cap-srv';
+const DESTINATION_NAME = 'aiagentsample-deepdiveXXX-cap-srv';
 
 // GETリクエスト
 async function callGetFromDestination() {

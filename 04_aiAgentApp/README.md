@@ -217,6 +217,22 @@
    - 2本のモデル（チャットモデル+エンべディングモデル）をデプロイメントとして追加しますが、かなり時間がかかります(10分 x 2 程度)。途中でスクリプトによる監視が途切れた時は、同じスクリプトを再度実行し、`2)モデルデプロイ`にて再度監視を開始してください。
    ![デプロイメント作成](assets/README/setup/80_createLLMDeployment_runCreationAndCheckState.png)
 
+5. SAP CAPの環境変数に、デプロイが完了したモデルのIDを上書きします。
+    ```bash
+    node 03_createLLMDeployments/02_migrateDeploymentId.js
+    ```
+    - 完了すると、`cap/.cdsrc.json`にデプロイメントのIDが指定され、LLMモデルにCAPからアクセスできるようになります。
+    ![デプロイメントIDをCAPに設定](assets/README/setup/81_migrateDeploymentIdToCdsrc.png)
+
+6. SAP CAPを再デプロイします。
+    ```bash
+    cd ../
+    mbt build
+    cf deploy mta_archives/<プロジェクト名>.mtar
+    ```
+    - これにより、上記の環境変数が反映されます。
+    ![CAPの再デプロイ](assets/README/setup/82_reDeployApp.png)
+
 5. SAP AI LaunchpadとSAP AI Coreのインスタンスを紐付けます：
    - SAP AI Launchpadにログインします
         - **この際、Default Identity Providerでログインしてください。カスタムIASで認証が走ってしまっている場合は、シークレットモードでSAP AI Launchpadのリンクを開いてください。**
@@ -226,6 +242,9 @@
      ![インスタンス選択](assets/README/setup/68_launchpadConfig_openAILaunchpad.png)
    - 紐付けが完了したことを確認します
      ![紐付け完了](assets/README/setup/69_launchpadConfig_uploadSK.png)
+   - 上記作業で作成されたConfigurationやDeploymentsの確認が可能です。
+
+
 
 ### 3.3 テストリクエストの実行
 
