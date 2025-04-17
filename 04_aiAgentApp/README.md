@@ -84,6 +84,13 @@
      ![Gitからクローン](assets/README/setup/39_createWorkSpace_CloneFromGit.png)
    - プロジェクトがクローンされたことを確認します
      ![プロジェクトクローン完了](assets/README/setup/40_createWorkSpace_clonedProject.png)
+   
+   - 自分のIDに合わせてファイル内のdeepdiveXXXを置き換えます：
+     - 検索機能を開きます
+       ![検索機能を開く](assets/README/setup/78_replaceIdentifier_openSearchColumn.png)
+     - mta.yamlをはじめとする諸ファイル内のdeepdiveXXXを自分のIDで置き換えます
+       ![deepdiveXXXを置き換え](assets/README/setup/79_replaceIdentifier_replaceDeepDiveXXX.png)
+       
    - ターミナルを開き、プロジェクトディレクトリに移動します
      ![ターミナルを開く](assets/README/setup/41_createWorkSpace_openTerminalAndGoToProjectDir.png)
 
