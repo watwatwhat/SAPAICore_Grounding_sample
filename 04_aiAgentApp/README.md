@@ -203,18 +203,23 @@
 4. LLMデプロイメントを作成します：
    ```bash
    # リソースグループを作成
-   node 03_createLLMDeployments/01_createResourceGroup.js
+   node 03_createLLMDeployments/01_init.js
+   🔧 モード選択: 1) ResourceGroup作成, 2) モデルデプロイ, 3) 状態確認 [1/2/3]: 1
    ```
    リソースグループが作成されたことを確認します：
    ![リソースグループ作成](assets/README/setup/64_createResourceGroup.png)
 
    ```bash
    # デプロイメントを作成
-   node 03_createLLMDeployments/02_createDeployments.js
+   node 03_createLLMDeployments/01_init.js
+   🔧 モード選択: 1) ResourceGroup作成, 2) モデルデプロイ, 3) 状態確認 [1/2/3]: 2
    ```
+   - 2本のモデル（チャットモデル+エンべディングモデル）をデプロイメントとして追加しますが、かなり時間がかかります(10分 x 2 程度)。途中でスクリプトによる監視が途切れた時は、同じスクリプトを再度実行し、`2)モデルデプロイ`にて再度監視を開始してください。
+   ![デプロイメント作成](assets/README/setup/80_createLLMDeployment_runCreationAndCheckState.png)
 
 5. SAP AI LaunchpadとSAP AI Coreのインスタンスを紐付けます：
    - SAP AI Launchpadにログインします
+        - **この際、Default Identity Providerでログインしてください。カスタムIASで認証が走ってしまっている場合は、シークレットモードでSAP AI Launchpadのリンクを開いてください。**
    - インスタンスの紐付け画面を開きます
      ![インスタンス紐付け画面](assets/README/setup/67_launchpadConfig_getSK.png)
    - SAP AI Coreのインスタンスを選択します
