@@ -117,7 +117,7 @@ async function waitForResourceGroupReady(token) {
 }
 
 // ----- モデルデプロイ処理 -----
-async function createConfiguration(token, modelName, modelVersion) {
+async function createConfiguration(token, modelName, modelVersion, modelType) {
   const url = `${AI_API_HOST}/v2/lm/configurations`;
   const payload = {
     name: `${modelName}-configuration`,
@@ -136,13 +136,13 @@ async function createConfiguration(token, modelName, modelVersion) {
       'AI-Resource-Group': resourceGroupId
     }
   });
-  userCreds[`${modelName}_configurationId`] = res.data.id;
+  userCreds[`${modelType}Model_configurationId`] = res.data.id;
   fs.writeFileSync(userCredsPath, JSON.stringify(userCreds, null, 2));
   console.log('✅ Configuration created:', res.data.id);
   return res.data.id;
 }
 
-async function createDeployment(token, configurationId, modelName) {
+async function createDeployment(token, configurationId, modelName, modelType) {
   const url = `${AI_API_HOST}/v2/lm/deployments`;
   const payload = {
     configurationId,
@@ -156,7 +156,7 @@ async function createDeployment(token, configurationId, modelName) {
       'AI-Resource-Group': resourceGroupId
     }
   });
-  userCreds[`${modelName}_deploymentId`] = res.data.id;
+  userCreds[`${modelType}Model_deploymentId`] = res.data.id;
   fs.writeFileSync(userCredsPath, JSON.stringify(userCreds, null, 2));
   console.log('✅ Deployment created:', res.data.id);
   console.log('🔍 Now inspecting deployment status. Wait for it to be ready...');
@@ -219,17 +219,25 @@ async function waitForDeployment(token, deploymentId) {
       }
     } else if (mode === '2') {
       const models = [
-        { name: userCreds.chatModelName, version: userCreds.chatModelVersion },
-        { name: userCreds.embeddingModelName, version: userCreds.embeddingModelVersion }
+        { name: userCreds.chatModelName, version: userCreds.chatModelVersion, type: "chat" },
+        { name: userCreds.embeddingModelName, version: userCreds.embeddingModelVersion, type: "embedding" }
       ];
       for (const model of models) {
-        const confKey = `${model.name}_configurationId`;
-        const depKey = `${model.name}_deploymentId`;
+        let confKey = "";
+        let depKey = "";
+        if(model.type== "chat") {
+          confKey = `chatModel_configurationId`;
+          depKey = `chatModel_deploymentId`;
+        } else if (model.type== "embedding") {
+          confKey = `embeddingModel_configurationId`;
+          depKey = `embeddingModel_deploymentId`;
+        }
+        
         let configurationId = userCreds[confKey];
         let deploymentId = userCreds[depKey];
 
-        if (!configurationId) configurationId = await createConfiguration(token, model.name, model.version);
-        if (!deploymentId) deploymentId = await createDeployment(token, configurationId, model.name);
+        if (!configurationId) configurationId = await createConfiguration(token, model.name, model.version, model.type);
+        if (!deploymentId) deploymentId = await createDeployment(token, configurationId, model.name, model.type);
 
         await waitForDeployment(token, deploymentId);
         console.log(`🎉 ${model.name} のデプロイ完了！`);
