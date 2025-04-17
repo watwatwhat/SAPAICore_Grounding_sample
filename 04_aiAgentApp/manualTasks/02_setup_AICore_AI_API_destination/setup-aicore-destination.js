@@ -5,7 +5,7 @@ const qs = require('querystring');
 // === 設定値 ===
 const aicoreServiceInstance = 'default_aicore';
 const aicoreServiceKeyName = 'aicore_service-key';
-const destinationInstance = 'aiagentsample-destination';
+const destinationInstance = 'aiagentsample-deepdiveXXX-destination';
 const destinationServiceKeyName = 'destination_service-key';
 const destinationName = 'AICore_AI_API';
 
