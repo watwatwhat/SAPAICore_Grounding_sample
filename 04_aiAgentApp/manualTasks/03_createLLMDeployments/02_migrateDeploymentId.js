@@ -16,15 +16,15 @@ try {
   const cdsrc = JSON.parse(fs.readFileSync(cdsrcPath, 'utf8'));
 
   // デプロイメントIDの取得
-  const gpt4oDeploymentId = userDefined['gpt-4o_deploymentId'];
-  const embeddingDeploymentId = userDefined['text-embeddings-ada-002_deploymentId'];
+  const chatModelDeploymentId = userDefined['chatModel_deploymentId'];
+  const embeddingModelDeploymentId = userDefined['embeddingModel_deploymentId'];
 
-  console.log(`🔧 gpt-4o_deploymentId: ${gpt4oDeploymentId}`);
-  console.log(`🔧 text-embeddings-ada-002_deploymentId: ${embeddingDeploymentId}`);
+  console.log(`🔧 chatModel_deploymentId: ${chatModelDeploymentId}`);
+  console.log(`🔧 embeddingModel_deploymentId: ${embeddingModelDeploymentId}`);
 
   // URL置き換え処理
-  cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${gpt4oDeploymentId}`;
-  cdsrc.requires.GENERATIVE_AI_HUB.EMBEDDING_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${embeddingDeploymentId}`;
+  cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${chatModelDeploymentId}`;
+  cdsrc.requires.GENERATIVE_AI_HUB.EMBEDDING_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${embeddingModelDeploymentId}`;
 
   console.log('✍️ 置換後のURL:');
   console.log(`   CHAT_MODEL_DEPLOYMENT_URL: ${cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_DEPLOYMENT_URL}`);

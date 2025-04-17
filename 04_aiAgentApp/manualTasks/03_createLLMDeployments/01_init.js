@@ -123,10 +123,12 @@ async function createConfiguration(token, modelName, modelVersion) {
     name: `${modelName}-configuration`,
     executableId: 'azure-openai',
     scenarioId: 'foundation-models',
-    parameters: { modelName, modelVersion },
+    parameterBindings: [{ key: "modelName", value: modelName }, { key: "modelVersion", value: modelVersion }],
     artifacts: { model: { artifactName: `${modelName}-model`, version: modelVersion } },
     environment: { variables: {} }
   };
+
+  console.log(payload);
   const res = await axios.post(url, payload, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -217,8 +219,8 @@ async function waitForDeployment(token, deploymentId) {
       }
     } else if (mode === '2') {
       const models = [
-        { name: 'gpt-4o', version: 'latest' },
-        { name: 'text-embeddings-ada-002', version: 'latest' }
+        { name: userCreds.chatModelName, version: userCreds.chatModelVersion },
+        { name: userCreds.embeddingModelName, version: userCreds.embeddingModelVersion }
       ];
       for (const model of models) {
         const confKey = `${model.name}_configurationId`;
