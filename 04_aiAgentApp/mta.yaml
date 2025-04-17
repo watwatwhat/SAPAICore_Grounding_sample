@@ -1,109 +1,5 @@
-# _schema-version: 3.3.0
-# ID: aiagentsample
-# version: 1.0.0
-# description: "CAP and python."
-# parameters:
-#   enable-parallel-deployments: true
-# build-parameters:
-#  before-all:
-#    - builder: custom
-#      commands:
-#       - npm install --prefix cap
-#       - cds build --project cap
-
-# modules:
-#   - name: aiagentsample-ai-agent-srv
-#     type: python
-#     path: python
-#     parameters:
-#       buildpack: python_buildpack
-#       disk-quota: 1G
-#       memory: 512M
-#       command: flask run
-#       health-check-type: port
-#     properties:
-#       FLASK_APP: server.py
-#       FLASK_DEBUG: 0
-#       FLASK_RUN_HOST: 0.0.0.0
-#       FLASK_RUN_PORT: 8080
-#       AICORE_RESOURCE_GROUP: default
-      
-#     # DB / Destination / XSUAA / AI Core / SAP Cloud Logging をバインド
-#     requires:
-#       - name: aiagentsample-db
-#       - name: aiagentsample-destination
-#       - name: aiagentsample-auth
-#       - name: default_aicore
-#       - name: default_logging
-
-#   - name: aiagentsample-srv
-#     type: nodejs
-#     path: cap/gen/srv
-#     parameters:
-#       instances: 1
-#       buildpack: nodejs_buildpack
-#       memory: 256M
-#     build-parameters:
-#       # builder: npm-ci
-#       before-all:
-#         - builder: custom
-#           commands:
-#             - npm install
-#     provides:
-#       - name: srv-api # required by consumers of CAP services (e.g. approuter)
-#         properties:
-#           srv-url: ${default-url}
-#     # DB / Destination / XSUAA / AI Core / SAP Cloud Logging  をバインド
-#     requires:
-#       - name: aiagentsample-db
-#       - name: aiagentsample-destination
-#       - name: aiagentsample-auth
-#       - name: default_aicore
-#       - name: default_logging
-
-#   # - name: aiagentsample-db-deployer
-#   #   type: hdb
-#   #   path: cap/gen/db
-#   #   parameters:
-#   #     buildpack: nodejs_buildpack
-#   #   requires:
-#   #     - name: aiagentsample-db
-
-# resources:
-#   # SAP HANA Cloud HDIコンテナ のインスタンス
-#   # - name: aiagentsample-db
-#   #   type: com.sap.xs.hdi-container
-#   #   parameters:
-#   #     service: hana
-#   #     service-plan: hdi-shared
-#   # Destination のインスタンス
-#   - name: aiagentsample-destination
-#     type: org.cloudfoundry.managed-service
-#     parameters:
-#       service: destination
-#       service-plan: lite
-#   # XSUAA のインスタンス
-#   - name: aiagentsample-auth
-#     type: org.cloudfoundry.managed-service
-#     parameters:
-#       service: xsuaa
-#       service-plan: application
-#       path: ./xs-security.json
-#       config:
-#         xsappname: aiagentsample
-#         tenant-mode: dedicated
-#   # SAP HANA Cloud のインスタンス
-#   - name: aiagentsample-db
-#     type: org.cloudfoundry.existing-service
-#   # SAP AI Core のインスタンス
-#   - name: default_aicore
-#     type: org.cloudfoundry.existing-service
-#   # SAP Cloud Logging のインスタンス
-#   - name: default_logging
-#     type: org.cloudfoundry.existing-service
-
 _schema-version: 3.3.0
-ID: aiagentsample
+ID: aiagentsample-deepdiveXXX
 version: 1.0.0
 description: "CAP and python."
 parameters:
@@ -116,7 +12,7 @@ build-parameters:
       - cds build --project cap
 
 modules:
-  - name: aiagentsample-ai-agent-srv
+  - name: aiagentsample-deepdiveXXX-ai-agent-srv
     type: python
     path: python
     parameters:
@@ -138,13 +34,13 @@ modules:
       
     # DB / Destination / XSUAA / AI Core / SAP Cloud Logging をバインド
     requires:
-      - name: aiagentsample-db
-      - name: aiagentsample-destination
-      - name: aiagentsample-auth
+      - name: aiagentsample-deepdiveXXX-db
+      - name: aiagentsample-deepdiveXXX-destination
+      - name: aiagentsample-deepdiveXXX-auth
       - name: default_aicore
       - name: default_logging
 
-  - name: aiagentsample-cap-srv
+  - name: aiagentsample-deepdiveXXX-cap-srv
     type: nodejs
     path: cap/gen/srv
     parameters:
@@ -162,29 +58,29 @@ modules:
           srv-url: ${default-url}
     # DB / Destination / XSUAA / AI Core / SAP Cloud Logging  をバインド
     requires:
-      - name: aiagentsample-db
-      - name: aiagentsample-destination  # Destinationサービスをここで利用
-      - name: aiagentsample-auth
+      - name: aiagentsample-deepdiveXXX-db
+      - name: aiagentsample-deepdiveXXX-destination  # Destinationサービスをここで利用
+      - name: aiagentsample-deepdiveXXX-auth
       - name: default_aicore
       - name: default_logging
 
-  # - name: aiagentsample-db-deployer
+  # - name: aiagentsample-deepdiveXXX-db-deployer
   #   type: hdb
   #   path: cap/gen/db
   #   parameters:
   #     buildpack: nodejs_buildpack
   #   requires:
-  #     - name: aiagentsample-db
+  #     - name: aiagentsample-deepdiveXXX-db
 
 resources:
   # SAP HANA Cloud HDIコンテナ のインスタンス
-  # - name: aiagentsample-db
+  # - name: aiagentsample-deepdiveXXX-db
   #   type: com.sap.xs.hdi-container
   #   parameters:
   #     service: hana
   #     service-plan: hdi-shared
   # Destination のインスタンス
-  - name: aiagentsample-destination
+  - name: aiagentsample-deepdiveXXX-destination
     type: org.cloudfoundry.managed-service
     parameters:
       config:
@@ -193,10 +89,10 @@ resources:
           instance:
             destinations:
             - Authentication: BasicAuthentication
-              User: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
-              Password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
+              User: deepdiveXXX  # Basic認証のユーザー名
+              Password: deepdiveXXX  # Basic認証のパスワード
               HTML5.DynamicDestination: true
-              Name: aiagentsample-cap-srv # CAPサービスをDestinationとして登録
+              Name: aiagentsample-deepdiveXXX-cap-srv # CAPサービスをDestinationとして登録
               ProxyType: Internet
               Type: HTTP
               URL: ~{srv-api/srv-url} # CAPサービスのURLを指定
@@ -206,10 +102,10 @@ resources:
               Type: HTTP
               URL: https://ui5.sap.com
             - Authentication: BasicAuthentication
-              User: HACKATHONGPT2025APIUSER  # Basic認証のユーザー名
-              Password: HACKATHONGPT2025APIPASSWORD  # Basic認証のパスワード
+              User: deepdiveXXX  # Basic認証のユーザー名
+              Password: deepdiveXXX  # Basic認証のパスワード
               HTML5.DynamicDestination: true
-              Name: aiagentsample-ai-agent-srv # PythonのAIエージェントサービスをDestinationとして登録
+              Name: aiagentsample-deepdiveXXX-ai-agent-srv # PythonのAIエージェントサービスをDestinationとして登録
               ProxyType: Internet
               Type: HTTP
               URL: ~{agent-srv-api/srv-url} # PythonのAIエージェントサービスをDestinationとして登録
@@ -220,17 +116,17 @@ resources:
       - name: srv-api
       - name: agent-srv-api
   # XSUAA のインスタンス
-  - name: aiagentsample-auth
+  - name: aiagentsample-deepdiveXXX-auth
     type: org.cloudfoundry.managed-service
     parameters:
       service: xsuaa
       service-plan: application
       path: ./xs-security.json
       config:
-        xsappname: aiagentsample
+        xsappname: aiagentsample-deepdiveXXX
         tenant-mode: dedicated
   # SAP HANA Cloud のインスタンス
-  - name: aiagentsample-db
+  - name: aiagentsample-deepdiveXXX-db
     type: org.cloudfoundry.existing-service
   # SAP AI Core のインスタンス
   - name: default_aicore
