@@ -192,13 +192,15 @@
    node 02_setup_AICore_AI_API_destination/setup-aicore-destination.js
    ```
 
-3. AI Coreインスタンスをバインドします：
+3. AI CoreインスタンスをCAPアプリケーションにバインドします：
    - Command Paletteを開き、「>bind」と入力してローカルバインドを実行するを選択し、バインド先のディレクトリを選択します。capのディレクトリを選択します。
      ![Command Paletteを開く](assets/README/setup/61_createLLMDeployment_bindAICore_openCommandPalette.png)
    - `default_aicore`のインスタンスを選択します
      ![インスタンスを選択](assets/README/setup/62_createLLMDeployment_bindAICore_selectInstance.png)
    - SAP AI Coreインスタンスの環境情報が作成されたことを確認します
      ![環境作成完了](assets/README/setup/63_createLLMDeployment_bindAICore_addedEnv.png)
+  - **同様の操作を、pythonのディレクトリに対しても行いましょう。これにより、後続のテストリクエストを処理できるようになります。**
+
 
 4. LLMデプロイメントを作成します：
    ```bash
@@ -243,7 +245,6 @@
    - 紐付けが完了したことを確認します
      ![紐付け完了](assets/README/setup/69_launchpadConfig_uploadSK.png)
    - 上記作業で作成されたConfigurationやDeploymentsの確認が可能です。
-
 
 
 ### 3.3 テストリクエストの実行
