@@ -1,4 +1,12 @@
-# SAP AI Core Grounding サンプルアプリケーション セットアップ手順
+# AI Agent アプリケーション on SAP BTP (SAP Embedding版) ハンズオン実施手順
+
+## 概要
+この手順書では、SAP HANA Cloud, Vector Engine に追加されたIn-Database Vectorizationと、SAP AI Core - Generative AI HubによるSAPのLLMパートナー企業から提供されるEmbeddingモデルを併用した、LangChainフレームワークによるAI Agentアプリケーションを構築します。
+
+### アーキテクチャイメージ
+![04_aiAgentAppの概要](assets/README/setup/00_aiAgentApp_overview.png)
+
+
 
 ## 1. HANA Cloud セットアップ
 
