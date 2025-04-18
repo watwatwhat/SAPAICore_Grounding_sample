@@ -160,7 +160,7 @@
      ![サンプルデータ投入](assets/README/setup/59_insertSampleData.png)
    - データが投入されたことを確認します
 
-5. SAP HANA Database Explorerでデータを確認します：
+### 3.1.5 SAP HANA Database Explorerでデータを確認します
    - SAP HANA Centralを開きます
      ![HANA Centralを開く](assets/README/setup/70_DBX_openHANACentral.png)
    - Database Explorerを開きます
@@ -266,8 +266,14 @@
     ```
    
 5. POSTリクエストのテスト結果を確認します：
+  - POSTリクエストにより、SAP CAPを介してDBにデータを登録します。カスタムハンドラを用いて、格納後にカスタムのEmbeddingを特定のカラムに格納しています。
+  ![POSTリクエストテスト結果](assets/README/setup/83_test_addDataViaAPI.png)
 
-
+6. SAP HANA Database Explorerより挿入されたデータを確認する
+  - SAP HANA Database Explorerへのアクセスは[こちら](#315-sap-hana-database-explorerでデータを確認します)をご参照ください。
+  - CUSTOM_EMBEDDINGカラムに、SAP AI Coreにデプロイしてカスタムで作成したベクトル表現が格納されます。
+  ![POSTリクエストテスト結果](assets/README/setup/84_addedCustomEmbeddingData.png)
+  
 
 #### Pythonモジュール用のテストリクエスト
 1. Node.js がインストールされていることを確認します
