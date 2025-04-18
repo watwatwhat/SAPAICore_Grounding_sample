@@ -5,7 +5,7 @@ const qs = require('querystring');
 // === 設定値 ===
 const aicoreServiceInstance = 'default_aicore';
 const aicoreServiceKeyName = 'aicore_service-key';
-const destinationInstance = 'aiagentsample-destination';
+const destinationInstance = 'aiagentsample-deepdiveXXX-destination';
 const destinationServiceKeyName = 'destination_service-key';
 const destinationName = 'AICore_AI_API';
 
@@ -113,7 +113,10 @@ async function createOrUpdateDestination(destKey, accessToken, aicoreKey) {
         clientId: aicoreKey.clientid,
         clientSecret: aicoreKey.clientsecret,
         tokenServiceURL: `${aicoreKey.url}/oauth/token`,
-        Description: "Destination to AI Core"
+        Description: "Destination to AI Core",
+        "HTML5.DynamicDestination": "true",
+        "URL.headers.AI-Resource-Group": "deepdiveXXX",
+        "URL.headers.Content-Type": "application/json"
     };
 
     const exists = await checkIfDestinationExists(destKey, accessToken, destinationName);

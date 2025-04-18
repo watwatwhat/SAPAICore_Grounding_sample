@@ -1,4 +1,12 @@
-# SAP AI Core Grounding サンプルアプリケーション セットアップ手順
+# AI Agent アプリケーション on SAP BTP (SAP Embedding版) ハンズオン実施手順
+
+## 概要
+この手順書では、SAP HANA Cloud, Vector Engine に追加されたIn-Database Vectorizationと、SAP AI Core - Generative AI HubによるSAPのLLMパートナー企業から提供されるEmbeddingモデルを併用した、LangChainフレームワークによるAI Agentアプリケーションを構築します。
+
+### アーキテクチャイメージ
+![04_aiAgentAppの概要](assets/README/setup/00_aiAgentApp_overview.png)
+
+
 
 ## 1. HANA Cloud セットアップ
 
@@ -57,6 +65,7 @@
 
 2. HDI コンテナを作成します
    ![HDI作成1](assets/README/setup/19_hdi_createHdi_1.png)
+   - **この際、「aiagentsample-deepdiveXXX-db」という名前に対して、自分のIDをXXXに代入した値を入力してください。**
    ![HDI作成2](assets/README/setup/20_hdi_createHdi_2.png)
    <!-- ![HDI作成完了](assets/README/setup/21_hdi_createHdi_created.png) -->
 
@@ -84,6 +93,13 @@
      ![Gitからクローン](assets/README/setup/39_createWorkSpace_CloneFromGit.png)
    - プロジェクトがクローンされたことを確認します
      ![プロジェクトクローン完了](assets/README/setup/40_createWorkSpace_clonedProject.png)
+   
+   - 自分のIDに合わせてファイル内のdeepdiveXXXを置き換えます：
+     - 検索機能を開きます
+       ![検索機能を開く](assets/README/setup/78_replaceIdentifier_openSearchColumn.png)
+     - mta.yamlをはじめとする諸ファイル内のdeepdiveXXXを自分のIDで置き換えます
+       ![deepdiveXXXを置き換え](assets/README/setup/79_replaceIdentifier_replaceDeepDiveXXX.png)
+       
    - ターミナルを開き、プロジェクトディレクトリに移動します
      ![ターミナルを開く](assets/README/setup/41_createWorkSpace_openTerminalAndGoToProjectDir.png)
 
@@ -152,7 +168,7 @@
      ![サンプルデータ投入](assets/README/setup/59_insertSampleData.png)
    - データが投入されたことを確認します
 
-5. SAP HANA Database Explorerでデータを確認します：
+### 3.1.5 SAP HANA Database Explorerでデータを確認します
    - SAP HANA Centralを開きます
      ![HANA Centralを開く](assets/README/setup/70_DBX_openHANACentral.png)
    - Database Explorerを開きます
@@ -184,35 +200,60 @@
    node 02_setup_AICore_AI_API_destination/setup-aicore-destination.js
    ```
 
-3. AI Coreインスタンスをバインドします：
+3. AI CoreインスタンスをCAPアプリケーションにバインドします：
    - Command Paletteを開き、「>bind」と入力してローカルバインドを実行するを選択し、バインド先のディレクトリを選択します。capのディレクトリを選択します。
      ![Command Paletteを開く](assets/README/setup/61_createLLMDeployment_bindAICore_openCommandPalette.png)
    - `default_aicore`のインスタンスを選択します
      ![インスタンスを選択](assets/README/setup/62_createLLMDeployment_bindAICore_selectInstance.png)
    - SAP AI Coreインスタンスの環境情報が作成されたことを確認します
      ![環境作成完了](assets/README/setup/63_createLLMDeployment_bindAICore_addedEnv.png)
+  - **同様の操作を、pythonのディレクトリに対しても行いましょう。これにより、後続のテストリクエストを処理できるようになります。**
+
 
 4. LLMデプロイメントを作成します：
    ```bash
    # リソースグループを作成
-   node 03_createLLMDeployments/01_createResourceGroup.js
+   node 03_createLLMDeployments/01_init.js
+   🔧 モード選択: 1) ResourceGroup作成, 2) モデルデプロイ, 3) 状態確認 [1/2/3]: 1
    ```
    リソースグループが作成されたことを確認します：
    ![リソースグループ作成](assets/README/setup/64_createResourceGroup.png)
 
    ```bash
    # デプロイメントを作成
-   node 03_createLLMDeployments/02_createDeployments.js
+   node 03_createLLMDeployments/01_init.js
+   🔧 モード選択: 1) ResourceGroup作成, 2) モデルデプロイ, 3) 状態確認 [1/2/3]: 2
    ```
+   - 2本のモデル（チャットモデル+エンべディングモデル）をデプロイメントとして追加しますが、かなり時間がかかります(10分 x 2 程度)。途中でスクリプトによる監視が途切れた時は、同じスクリプトを再度実行し、`2)モデルデプロイ`にて再度監視を開始してください。
+   ![デプロイメント作成](assets/README/setup/80_createLLMDeployment_runCreationAndCheckState.png)
+
+5. SAP CAPの環境変数に、デプロイが完了したモデルのIDを上書きします。
+    ```bash
+    node 03_createLLMDeployments/02_migrateDeploymentId.js
+    ```
+    - 完了すると、`cap/.cdsrc.json`にデプロイメントのIDが指定され、LLMモデルにCAPからアクセスできるようになります。
+    ![デプロイメントIDをCAPに設定](assets/README/setup/81_migrateDeploymentIdToCdsrc.png)
+
+6. SAP CAPを再デプロイします。
+    ```bash
+    cd ../
+    mbt build
+    cf deploy mta_archives/<プロジェクト名>.mtar
+    ```
+    - これにより、上記の環境変数が反映されます。
+    ![CAPの再デプロイ](assets/README/setup/82_reDeployApp.png)
 
 5. SAP AI LaunchpadとSAP AI Coreのインスタンスを紐付けます：
    - SAP AI Launchpadにログインします
+        - **この際、Default Identity Providerでログインしてください。カスタムIASで認証が走ってしまっている場合は、シークレットモードでSAP AI Launchpadのリンクを開いてください。**
    - インスタンスの紐付け画面を開きます
      ![インスタンス紐付け画面](assets/README/setup/67_launchpadConfig_getSK.png)
    - SAP AI Coreのインスタンスを選択します
      ![インスタンス選択](assets/README/setup/68_launchpadConfig_openAILaunchpad.png)
    - 紐付けが完了したことを確認します
      ![紐付け完了](assets/README/setup/69_launchpadConfig_uploadSK.png)
+   - 上記作業で作成されたConfigurationやDeploymentsの確認が可能です。
+
 
 ### 3.3 テストリクエストの実行
 
@@ -234,8 +275,14 @@
     ```
    
 5. POSTリクエストのテスト結果を確認します：
+  - POSTリクエストにより、SAP CAPを介してDBにデータを登録します。カスタムハンドラを用いて、格納後にカスタムのEmbeddingを特定のカラムに格納しています。
+  ![POSTリクエストテスト結果](assets/README/setup/83_test_addDataViaAPI.png)
 
-
+6. SAP HANA Database Explorerより挿入されたデータを確認する
+  - SAP HANA Database Explorerへのアクセスは[こちら](#315-sap-hana-database-explorerでデータを確認します)をご参照ください。
+  - CUSTOM_EMBEDDINGカラムに、SAP AI Coreにデプロイしてカスタムで作成したベクトル表現が格納されます。
+  ![POSTリクエストテスト結果](assets/README/setup/84_addedCustomEmbeddingData.png)
+  
 
 #### Pythonモジュール用のテストリクエスト
 1. Node.js がインストールされていることを確認します
@@ -243,10 +290,17 @@
    ```bash
    node 03_test_requests/python/test.js
    ```
-   どの操作を実行しますか？（get / post）: get
+   どのエンドポイントを呼び出しますか？（chat / chain）: chain
 
-3. GETリクエストのテスト結果を確認します：
-   ![GETリクエストテスト結果](assets/README/setup/60_test_getData.png)
+3.`/chain`エンドポイントに対するリクエストのテスト結果を確認します：
+   ![chainエンドポイントの呼び出し](assets/README/setup/85_executePythonModule.png)
+
+4. ログの確認
+  - `cf apps` にて、デプロイされたアプリケーション一覧を表示し、ai-agentアプリの名前をコピーする
+  - `cf logs <アプリケーション名>` により、ログをストリーミングする
+  - この状態で上記のテストリクエストを送付すると、下記の通りログを確認できる。
+  - SAP HANA Cloud からRAGツールを用いて関連するデータを取得し、それに基づいて回答を生成していることが確認できる。
+   ![LangChainログ](assets/README/setup/86_getPythonLogs.png)
    
 
 ## 注意事項

@@ -5,7 +5,12 @@ const { executeHttpRequest } = require('@sap-cloud-sdk/core');
 const { getDestination } = require('@sap-cloud-sdk/connectivity');
 const readline = require('readline');
 
-const DESTINATION_NAME = 'aiagentsample-ai-agent-srv'; // Destination サービスで設定した名前
+const DESTINATION_NAME = 'aiagentsample-deepdive001-ai-agent-srv'; // Destination サービスで設定した名前
+
+// .env からユーザー名とパスワードを読み込む
+const BASIC_USER = process.env.BASIC_USER;
+const BASIC_PASS = process.env.BASIC_PASSWORD;
+const basicAuth = Buffer.from(`${BASIC_USER}:${BASIC_PASS}`).toString('base64');
 
 // /chat エンドポイントへの POST リクエスト
 async function callChatEndpoint() {
@@ -14,7 +19,10 @@ async function callChatEndpoint() {
         const response = await executeHttpRequest(destination, {
             method: 'POST',
             url: '/chat',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${basicAuth}`
+            },
             data: {
                 question: "SAP HANAとは何ですか？"
             }
@@ -32,10 +40,13 @@ async function callChainEndpoint() {
         const response = await executeHttpRequest(destination, {
             method: 'POST',
             url: '/chain',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Basic ${basicAuth}`
+            },
             data: {
                 question: "SAP BTP Hackathonについて質問です。SAP AI Launchpadに「Generative AI Hub」のメニューが表示されていないのですが、考えられる原因はなんですか？",
-                mode: "SAP",
+                mode: "SAP", // "SAP"にセットするとSAP HANA Cloud, Vector Engine内蔵のモデルによるRAG、"CUSTOM"にセットするとカスタムのエンべディングモデルによるRAGが実行されます。
                 history: []
             }
         });

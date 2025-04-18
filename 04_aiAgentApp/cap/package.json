@@ -38,8 +38,8 @@
         "[production]": {
           "kind": "mocked",
           "users": {
-            "HACKATHONGPT2025APIUSER": {
-              "password": "HACKATHONGPT2025APIPASSWORD"
+            "deepdiveXXX": {
+              "password": "deepdiveXXX"
             }
           }
         }
