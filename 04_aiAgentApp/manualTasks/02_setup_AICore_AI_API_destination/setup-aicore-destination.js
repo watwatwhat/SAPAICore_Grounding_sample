@@ -113,7 +113,10 @@ async function createOrUpdateDestination(destKey, accessToken, aicoreKey) {
         clientId: aicoreKey.clientid,
         clientSecret: aicoreKey.clientsecret,
         tokenServiceURL: `${aicoreKey.url}/oauth/token`,
-        Description: "Destination to AI Core"
+        Description: "Destination to AI Core",
+        "HTML5.DynamicDestination": "true",
+        "URL.headers.AI-Resource-Group": "deepdiveXXX",
+        "URL.headers.Content-Type": "application/json"
     };
 
     const exists = await checkIfDestinationExists(destKey, accessToken, destinationName);
