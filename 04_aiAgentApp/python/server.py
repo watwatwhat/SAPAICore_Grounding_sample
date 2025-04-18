@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 cf_port = None
 
 USERNAME = os.getenv("BASIC_USER")
-PASSWORD = os.getenv("BASIC_PASS")
+PASSWORD = os.getenv("BASIC_PASSWORD")
 
 # ======================== BASIC認証用のデコレーターの定義 ======================== 
 
