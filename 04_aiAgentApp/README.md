@@ -282,10 +282,17 @@
    ```bash
    node 03_test_requests/python/test.js
    ```
-   どの操作を実行しますか？（get / post）: get
+   どのエンドポイントを呼び出しますか？（chat / chain）: chain
 
-3. GETリクエストのテスト結果を確認します：
-   ![GETリクエストテスト結果](assets/README/setup/60_test_getData.png)
+3.`/chain`エンドポイントに対するリクエストのテスト結果を確認します：
+   ![chainエンドポイントの呼び出し](assets/README/setup/85_executePythonModule.png)
+
+4. ログの確認
+  - `cf apps` にて、デプロイされたアプリケーション一覧を表示し、ai-agentアプリの名前をコピーする
+  - `cf logs <アプリケーション名>` により、ログをストリーミングする
+  - この状態で上記のテストリクエストを送付すると、下記の通りログを確認できる。
+  - SAP HANA Cloud からRAGツールを用いて関連するデータを取得し、それに基づいて回答を生成していることが確認できる。
+   ![LangChainログ](assets/README/setup/86_getPythonLogs.png)
    
 
 ## 注意事項
