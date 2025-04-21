@@ -5,7 +5,7 @@ const { executeHttpRequest } = require('@sap-cloud-sdk/core');
 const { getDestination } = require('@sap-cloud-sdk/connectivity');
 const readline = require('readline');
 
-const DESTINATION_NAME = 'aiagentsample-deepdive001-ai-agent-srv'; // Destination サービスで設定した名前
+const DESTINATION_NAME = 'aiagentsample-deepdiveXXX-ai-agent-srv'; // Destination サービスで設定した名前
 
 // .env からユーザー名とパスワードを読み込む
 const BASIC_USER = process.env.BASIC_USER;
