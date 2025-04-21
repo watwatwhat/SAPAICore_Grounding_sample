@@ -123,7 +123,7 @@ async function createConfiguration(token, modelName, modelVersion, modelType) {
     name: `${modelName}-configuration`,
     executableId: 'azure-openai',
     scenarioId: 'foundation-models',
-    parameterBindings: [{ key: "modelName", value: modelName }, { key: "modelVersion", value: modelVersion }],
+    parameterBindings: [{ key: "modelName", value: modelName }, { key: "modelVersion", value: "latest" }],
     artifacts: { model: { artifactName: `${modelName}-model`, version: modelVersion } },
     environment: { variables: {} }
   };
