@@ -27,3 +27,5 @@ package-lock.json
 # 手動実行タスク用
 04_aiAgentApp/manualTasks/node_modules
 04_aiAgentApp/manualTasks/package-lock.json
+05_aiAgentApp_simple/manualTasks/node_modules
+05_aiAgentApp_simple/manualTasks/package-lock.json
