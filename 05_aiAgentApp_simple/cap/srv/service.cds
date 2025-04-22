@@ -1,10 +1,9 @@
 using {gptservice as my} from '../db/schema';
 
 service GPTService {
-  entity Qahistory as
+  entity QahistoryView as
     projection on my.Qahistory
     excluding {
-      // sap_embedding,
       custom_embedding
     };
 }

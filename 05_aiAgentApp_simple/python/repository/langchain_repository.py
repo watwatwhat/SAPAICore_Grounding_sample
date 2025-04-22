@@ -8,9 +8,7 @@ from langchain_core.prompts import PromptTemplate
 from gen_ai_hub.proxy.langchain.openai import OpenAIEmbeddings, ChatOpenAI
 from dotenv import load_dotenv
 
-from tool.qa_sap_retriever import QASapRetriever
 from tool.qa_custom_retriever import QACustomRetriever
-
 from utils.rag_context_callback_handler import RagContextCallbackHandler
 
 # .envを読み込む
@@ -62,29 +60,17 @@ class LangChainRepository:
         tools = [
             math_tool
         ]
-        
-        # ============================ modeに合わせてRetrievalツールをtools配列に追加 ============================
-        if mode == "SAP":
-            print("SAP_NEB.20240715 を利用してHANA Cloud側でEmbeddingして近似検索")
-            qa_sap_retriever = QASapRetriever()
-            qa_sap_retriever_tool = Tool(
-                name="SAPに関する知識DBへのクエリ(SAPEmbedding)",
-                description="SAPに関する質問について調べたい場合は、このツールを利用する。metadatareferenceという項目がある場合には、それを明示して回答に利用すること。",
-                func=qa_sap_retriever._run,
-                coroutine=qa_sap_retriever._arun,
-            )
-            tools.append(qa_sap_retriever_tool)
-        elif mode == "CUSTOM":
-            print("text-embedding-ada-002 を使って、外部でEmbeddingして近似検索")
-            qa_custom_retriever = QACustomRetriever()
-            qa_custom_retriever_tool = Tool(
-                name="SAPに関する知識DBへのクエリ(CustomEmbedding)",
-                description="SAPに関する質問について調べたい場合は、このツールを利用する。metadatareferenceという項目がある場合には、それを明示して回答に利用すること。",
-                func=qa_custom_retriever._run,
-                coroutine=qa_custom_retriever._arun,
-            )
-            tools.append(qa_custom_retriever_tool)
-        # =========================================================================================
+
+        # 外部でEmbeddingを行い、近似検索を実施するために "text-embedding-ada-002" モデルを使用する
+        print("text-embedding-ada-002 を使って、外部でEmbeddingして近似検索")
+        qa_custom_retriever = QACustomRetriever()
+        qa_custom_retriever_tool = Tool(
+            name="SAPに関する知識DBへのクエリ(CustomEmbedding)",
+            description="SAPに関する質問について調べたい場合は、このツールを利用する。metadatareferenceという項目がある場合には、それを明示して回答に利用すること。",
+            func=qa_custom_retriever._run,
+            coroutine=qa_custom_retriever._arun,
+        )
+        tools.append(qa_custom_retriever_tool)
         
         # LangChainのループを回している内部プロンプト。本来は明記する必要もないが、今回はわかりやすくするために、ここも自力で記述する形式をとっている。
         # 下手に書き換えるとLangChainの動作シーケンスが壊れてクラッシュするため、ここの内容はいじらないのが原則。

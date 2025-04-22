@@ -22,7 +22,7 @@ module.exports = function () {
 
     const { Qahistory } = cds.entities;
 
-    this.after(['CREATE', 'UPDATE'], 'Qahistory', async (qa) => {
+    this.after(['CREATE', 'UPDATE'], 'QahistoryView', async (qa) => {
         await embedQuestion(qa);
     });
 

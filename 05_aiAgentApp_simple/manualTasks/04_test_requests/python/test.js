@@ -5,7 +5,7 @@ const { executeHttpRequest } = require('@sap-cloud-sdk/core');
 const { getDestination } = require('@sap-cloud-sdk/connectivity');
 const readline = require('readline');
 
-const DESTINATION_NAME = 'aiagentsample-deepdiveXXX-ai-agent-srv'; // Destination サービスで設定した名前
+const DESTINATION_NAME = 'aiagentsample-simple-deepdiveXXX-ai-agent-srv'; // Destination サービスで設定した名前
 
 // .env からユーザー名とパスワードを読み込む
 const BASIC_USER = process.env.BASIC_USER;
@@ -46,7 +46,7 @@ async function callChainEndpoint() {
             },
             data: {
                 question: "SAP BTP Hackathonについて質問です。SAP AI Launchpadに「Generative AI Hub」のメニューが表示されていないのですが、考えられる原因はなんですか？",
-                mode: "SAP", // "SAP"にセットするとSAP HANA Cloud, Vector Engine内蔵のモデルによるRAG、"CUSTOM"にセットするとカスタムのエンべディングモデルによるRAGが実行されます。
+                mode: "CUSTOM", // "SAP"にセットするとSAP HANA Cloud, Vector Engine内蔵のモデルによるRAG、"CUSTOM"にセットするとカスタムのエンべディングモデルによるRAGが実行されます。
                 history: []
             }
         });

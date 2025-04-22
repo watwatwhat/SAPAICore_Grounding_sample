@@ -7,7 +7,7 @@ const { getDestination } = require("@sap-cloud-sdk/connectivity");
 const readline = require('readline');
 
 // Destination名を指定（BTP Cockpitで設定している名前）
-const DESTINATION_NAME = 'aiagentsample-deepdiveXXX-cap-srv';
+const DESTINATION_NAME = 'aiagentsample-simple-deepdiveXXX-cap-srv';
 
 // GETリクエスト
 async function callGetFromDestination() {
@@ -16,7 +16,7 @@ async function callGetFromDestination() {
         const response = await executeHttpRequest(capDestination,
             {
                 method: 'GET',
-                url: '/odata/v4/GPT/Qahistory'
+                url: '/odata/v4/GPT/QahistoryView'
             }
         );
         console.log('✅ GET成功:', response.data);
@@ -32,7 +32,7 @@ async function callPostToDestination() {
         const response = await executeHttpRequest(capDestination,
             {
                 method: 'POST',
-                url: '/odata/v4/GPT/Qahistory',
+                url: '/odata/v4/GPT/QahistoryView',
                 headers: { 'Content-Type': 'application/json' },
                 data: {
                     question: "SAP HANAとは何ですか？",
