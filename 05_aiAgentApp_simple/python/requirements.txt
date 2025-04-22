@@ -1,0 +1,25 @@
+# SAP・DB関連
+hdbcli
+sap-xssec==4.1.0
+sap_cf_logging
+vcap_services==1.0.0
+cfenv==0.5.3
+
+# Flask関連
+flask
+flask-cors
+python-dotenv
+
+# Python標準強化・型定義・計算
+pydantic
+typing
+numexpr
+
+# AI/LLM関連
+generative-ai-hub-sdk[all]==4.0.0
+langchain==0.3.10
+langchain-core==0.3.22
+langfuse==2.56.0
+
+# その他
+requests

@@ -1,0 +1,5 @@
+ID,METADATA,QUESTION,ANSWER
+1,"{""refYear"": ""2024"", ""source"": ""https://example.com/questions/q1""}","SAP BTPの料金体系について教えてください。","SAP BTPではサービスごとに従量課金が適用され、使用量に応じて請求されます。詳しくはSAPの公式ドキュメントをご確認ください。"
+2,"{""refYear"": ""2024"", ""source"": ""https://example.com/questions/q2""}","SAP Build AppsでREST APIを使って外部サービスと連携することは可能ですか？","はい、SAP Build AppsではREST APIとの連携が可能です。HTTPリクエストコンポーネントを使用して外部APIと通信できます。"
+3,"{""refYear"": ""2024"", ""source"": ""https://example.com/questions/q3""}","SAP Build Process Automationで承認が一定時間内にされなかった場合の自動処理は可能ですか？","はい、承認タスクには期限（Due Date）を設定することができ、APIを使って期限後にタスクを自動で削除するなどの実装が可能です。"
+4,"{""refYear"": ""2024"", ""source"": ""https://example.com/questions/q4""}","SAP Build Work Zoneで日本語のページタイトルは使用可能ですか？","はい、日本語のタイトルやコンテンツも利用可能です。ただし一部システム項目では英語のみが推奨される場合もあります。"

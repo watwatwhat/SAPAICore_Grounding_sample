@@ -1,0 +1,28 @@
+{
+  "name": "btphackathon_aikit",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/watwatwhat/SAPAICore_Grounding_sample.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/watwatwhat/SAPAICore_Grounding_sample/issues"
+  },
+  "homepage": "https://github.com/watwatwhat/SAPAICore_Grounding_sample#readme",
+  "description": "",
+  "dependencies": {
+    "@sap-cloud-sdk/connectivity": "^4.0.2",
+    "@sap-cloud-sdk/core": "^1.54.2",
+    "axios": "^1.8.4",
+    "dotenv": "^16.5.0",
+    "fs": "^0.0.1-security",
+    "jwt-decode": "^4.0.0",
+    "qs": "^6.14.0"
+  }
+}
