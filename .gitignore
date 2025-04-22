@@ -7,12 +7,22 @@ package-lock.json
 04_aiAgentApp/mta_archives
 04_aiAgentApp/node_modules
 04_aiAgentApp/cap/.env
+05_aiAgentApp_simple/cap/node_modules
+05_aiAgentApp_simple/cap/gen
+05_aiAgentApp_simple/mta_archives
+05_aiAgentApp_simple/node_modules
+05_aiAgentApp_simple/cap/.env
 
 # Pythonモジュール
 04_aiAgentApp/python/venv
 04_aiAgentApp/python/utils/__pycache__
 04_aiAgentApp/python/tool/__pycache__
 04_aiAgentApp/python/repository/__pycache__
+
+05_aiAgentApp_simple/python/venv
+05_aiAgentApp_simple/python/utils/__pycache__
+05_aiAgentApp_simple/python/tool/__pycache__
+05_aiAgentApp_simple/python/repository/__pycache__
 
 # 手動実行タスク用
 04_aiAgentApp/manualTasks/node_modules
