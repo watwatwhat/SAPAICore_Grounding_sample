@@ -8,6 +8,7 @@
 - `02_orchestration/` - オーケストレーションのサンプルコード
 - `03_promptRegistry/` - プロンプトレジストリのサンプルコード
 - `04_aiAgentApp/` - AIエージェントアプリケーションのサンプルコード
+- `05_aiAgentApp_simple/` - シンプル版のAIエージェントアプリケーションのサンプルコード
 - `credentials/` - 認証情報ファイル格納ディレクトリ
 
 ## 01_grounding
