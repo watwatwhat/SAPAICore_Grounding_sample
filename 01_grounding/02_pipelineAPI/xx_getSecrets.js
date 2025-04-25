@@ -1,8 +1,8 @@
 // ========================
-// 
-// ドキュメントに対してベクトルか処理を施すためのパイプラインを生成する
+//
+// 指定した Secret の情報を取得するスクリプト
 // https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/pipeline-api
-// 
+//
 // ========================
 
 const axios = require('axios');
@@ -12,7 +12,6 @@ const qs = require('qs');
 
 // 🔐 認証情報を読み込み
 const aiCoreCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/ai_core_sk.json'), 'utf8'));
-const s3Creds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/object_store_sk.json'), 'utf8'));
 const userCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/user_defined_variable.json'), 'utf8'));
 
 // 認証情報
@@ -22,7 +21,7 @@ const xsuaaSecret = aiCoreCreds.clientsecret;
 const AI_API_HOST = aiCoreCreds.serviceurls.AI_API_URL;
 
 const resourceGroupId = userCreds.resourceGroupId;
-const secretName = userCreds.secretName;
+const secretName = userCreds.secretName; // 取得対象のSecret名
 
 // アクセストークン取得
 async function getXsuaaToken() {
@@ -46,55 +45,38 @@ async function getXsuaaToken() {
     return response.data.access_token;
 }
 
-// Pipeline 作成
-async function createS3Pipeline(token) {
-    const url = `${AI_API_HOST}/v2/lm/document-grounding/pipelines`;
+// Secret取得
+async function getSecret(token) {
+    const url = `${AI_API_HOST}/v2/admin/secrets/${secretName}`;
 
-    const payload = {
-        type: "S3",
-        configuration: {
-            destination: secretName
-        }
-    };
-    console.log(url);
-    console.log(payload);
-
-    const headers = {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'AI-Resource-Group': resourceGroupId,
-    };
-
-    for (const [key, value] of Object.entries(headers)) {
-        if (key === 'Authorization') {
-            const tokenSnippet = value.slice(7, 17); // "Bearer " の後ろから
-            console.log(`${key}: Bearer ${tokenSnippet}...`);
-        } else {
-            console.log(`${key}: ${value}`);
-        }
-    }
+    console.log(`📡 Secret 取得URL: ${url}`);
 
     try {
-        const response = await axios.post(url, payload, {
-            headers: headers,
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'AI-Resource-Group': resourceGroupId,
+                // 'AI-Tenant-Scope': 'true'
+            }
         });
 
-        console.log('✅ Pipeline 作成成功！');
-        console.log('📄 Pipeline ID:', response.data.id);
+        console.log('✅ Secret 取得成功！');
+        console.log('📄 Secret 情報:', JSON.stringify(response.data, null, 2));
         return response.data;
     } catch (err) {
         if (err.response) {
-            console.error('❌ Pipeline 作成エラー:', {
+            console.error('❌ Secret 取得エラー:', {
                 status: err.response.status,
                 statusText: err.response.statusText,
                 data: err.response.data,
             });
             throw err;
         } else if (err.request) {
-            console.error('❌ Pipeline 作成エラー: No response received', err.request);
+            console.error('❌ Secret 取得エラー: No response received', err.request);
             throw err;
         } else {
-            console.error('❌ Pipeline 作成エラー:', err.message);
+            console.error('❌ Secret 取得エラー:', err.message);
             throw err;
         }
     }
@@ -106,10 +88,10 @@ async function createS3Pipeline(token) {
         console.log('🔐 アクセストークン取得中...');
         const token = await getXsuaaToken();
 
-        console.log('📄 Pipeline 作成中...');
-        await createS3Pipeline(token);
+        console.log('🔍 Secret 取得中...');
+        await getSecret(token);
 
-        console.log('🎉 インデックス用Pipeline作成 完了！');
+        console.log('🎉 Secret取得処理 完了！');
     } catch (err) {
         console.error('❌ 実行エラー:', err.response?.data || err.message);
     }

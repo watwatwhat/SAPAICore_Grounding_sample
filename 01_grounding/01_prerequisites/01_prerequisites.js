@@ -223,21 +223,26 @@ async function getResourceGroupStatus(token) {
 
 async function createS3Secret(token) {
     const url = `${AI_API_HOST}/v2/admin/secrets`;
-    console.log(`🔑 S3シークレットを読み込み中: ${JSON.stringify(s3Info)}`);
+    console.log(`🔑 S3シークレットを読み込み中 ...`);
+
+    const secretData = {
+        // url: Buffer.from(`https://${s3Info.bucketName}.s3.${s3Info.region}.amazonaws.com`).toString('base64'),
+        url: Buffer.from(`https://s3.${s3Info.region}.amazonaws.com`).toString('base64'),
+        authentication: Buffer.from('NoAuthentication').toString('base64'),
+        description: Buffer.from('Grounding用のS3シークレット').toString('base64'),
+        access_key_id: Buffer.from(s3Info.accessKeyId).toString('base64'),
+        secret_access_key: Buffer.from(s3Info.secretAccessKey).toString('base64'),
+        bucket: Buffer.from(s3Info.bucketName).toString('base64'),
+        host: Buffer.from(s3Info.host).toString('base64'),
+        region: Buffer.from(s3Info.region).toString('base64'),
+        username: Buffer.from(s3Info.username).toString('base64'),
+    }
+
+    console.log(secretData);
 
     const payload = {
         name: secretName,
-        data: {
-            url: Buffer.from(`https://${s3Info.bucketName}.s3.${s3Info.region}.amazonaws.com`).toString('base64'),
-            authentication: Buffer.from('NoAuthentication').toString('base64'),
-            description: Buffer.from('Grounding用のS3シークレット').toString('base64'),
-            access_key_id: Buffer.from(s3Info.accessKeyId).toString('base64'),
-            secret_access_key: Buffer.from(s3Info.secretAccessKey).toString('base64'),
-            bucket: Buffer.from(s3Info.bucketName).toString('base64'),
-            host: Buffer.from(s3Info.host).toString('base64'),
-            region: Buffer.from(s3Info.region).toString('base64'),
-            username: Buffer.from(s3Info.username).toString('base64'),
-        },
+        data: secretData,
         labels: [
             {
                 key: 'ext.ai.sap.com/document-grounding',
@@ -250,13 +255,24 @@ async function createS3Secret(token) {
         ],
     };
 
+    const headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'AI-Resource-Group': resourceGroupId,
+    }
+
+    for (const [key, value] of Object.entries(headers)) {
+        if (key === 'Authorization') {
+            const tokenSnippet = value.slice(7, 17); // "Bearer " の後ろから
+            console.log(`${key}: Bearer ${tokenSnippet}...`);
+        } else {
+            console.log(`${key}: ${value}`);
+        }
+    }
+
     try {
         const response = await axios.post(url, payload, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'AI-Resource-Group': resourceGroupId,
-            },
+            headers: headers,
         });
         console.log('✅ S3シークレットを作成しました');
         console.log('🔍 レスポンス:', response.data);
