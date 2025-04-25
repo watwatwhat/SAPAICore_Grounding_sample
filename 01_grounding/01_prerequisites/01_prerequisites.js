@@ -17,22 +17,20 @@ function isValidResourceGroupId(id) {
     const validPattern = /^[a-zA-Z0-9]([a-zA-Z0-9.-]{1,251})[a-zA-Z0-9]$/;
 
     if (typeof id !== 'string') {
-        return { valid: false, reason: 'ID must be a string' };
+        return { valid: false, reason: 'IDは文字列である必要があります。' };
     }
     if (id.length < minLength || id.length > maxLength) {
-        return { valid: false, reason: `Length must be between ${minLength} and ${maxLength}` };
+        return { valid: false, reason: `長さは${minLength}〜${maxLength}文字である必要があります。` };
     }
     if (!validPattern.test(id)) {
         return {
             valid: false,
-            reason:
-                'ID must start and end with a letter or digit, and only contain letters, digits, hyphens (-), and periods (.) in between',
+            reason: 'IDは英数字で始まり・終わり、途中にハイフン(-)とピリオド(.)を含むことができます。',
         };
     }
     return { valid: true };
 }
 
-// 認証情報の読み込み
 const aiCoreCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/ai_core_sk.json'), 'utf8'));
 const s3Creds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/object_store_sk.json'), 'utf8'));
 const userCreds = JSON.parse(fs.readFileSync(path.join(__dirname, '../../credentials/user_defined_variable.json'), 'utf8'));
@@ -45,10 +43,9 @@ const AI_API_HOST = aiCoreCreds.serviceurls.AI_API_URL;
 const resourceGroupId = userCreds.resourceGroupId;
 const secretName = userCreds.secretName;
 
-// Resource Group ID バリデーション実行
 const validation = isValidResourceGroupId(resourceGroupId);
 if (!validation.valid) {
-    console.error(`❌ Invalid resourceGroupId "${resourceGroupId}": ${validation.reason}`);
+    console.error(`❌ 無効なresourceGroupId "${resourceGroupId}": ${validation.reason}`);
     process.exit(1);
 }
 
@@ -78,7 +75,7 @@ async function getXsuaaToken() {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
         });
-        console.log('✅ Fetched access_token!');
+        console.log('✅ アクセストークンを取得しました！');
         return response.data.access_token;
     } catch (err) {
         logAxiosError(err);
@@ -96,15 +93,15 @@ async function checkExistingResourceGroup(token) {
         });
 
         const { status, statusMessage, labels } = response.data;
-        console.log(`ℹ️ Resource Group "${resourceGroupId}" already exists.`);
-        console.log(`🔎 Status: ${status}`);
+        console.log(`ℹ️ Resource Group "${resourceGroupId}" はすでに存在します。`);
+        console.log(`🔎 ステータス: ${status}`);
         if (statusMessage) {
-            console.log(`📝 Message: ${statusMessage}`);
+            console.log(`📝 メッセージ: ${statusMessage}`);
         }
         return { exists: true, status, statusMessage, labels };
     } catch (err) {
         if (err.response && err.response.status === 404) {
-            console.log('ℹ️ No existing resource group found. Proceeding with creation...');
+            console.log('ℹ️ Resource Groupが存在しないため、作成を続行します...');
             return { exists: false };
         } else {
             logAxiosError(err);
@@ -116,13 +113,17 @@ async function checkExistingResourceGroup(token) {
 async function patchResourceGroupWithGroundingLabel(token) {
     const url = `${AI_API_HOST}/v2/admin/resourceGroups/${resourceGroupId}`;
     const payload = {
+        resourceGroupId: resourceGroupId,
         labels: [
             {
                 key: 'ext.ai.sap.com/document-grounding',
                 value: 'true',
-            }
-        ]
+            },
+        ],
     };
+
+    console.log(url);
+    console.log(payload);
 
     try {
         const response = await axios.patch(url, payload, {
@@ -131,42 +132,34 @@ async function patchResourceGroupWithGroundingLabel(token) {
                 'Content-Type': 'application/json',
             },
         });
-        console.log('🔧 Patched resource group to enable document-grounding!');
-        console.log('🔍 Response:', response.data);
+        console.log('🔧 Resource GroupにGrounding用ラベルを付与しました！');
+        console.log('🔍 レスポンス:', response.data);
     } catch (err) {
         logAxiosError(err);
-        throw new Error('❌ Failed to patch resource group with grounding label.');
+        throw new Error('❌ Resource Groupへのラベル付与に失敗しました。');
     }
 }
 
-async function promptUserContinue(message = 'Do you want to continue anyway? (yes/no): ') {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-
-    return new Promise(resolve => {
-        rl.question(`⚠️  ${message}`, answer => {
-            rl.close();
-            resolve(answer.toLowerCase() === 'yes');
-        });
-    });
-}
-
-async function deleteResourceGroup(token) {
-    const url = `${AI_API_HOST}/v2/admin/resourceGroups/${resourceGroupId}`;
-    try {
-        const response = await axios.delete(url, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        console.log('🗑️ Resource Group deleted.');
-        console.log('🔍 Response:', response.data);
-    } catch (err) {
-        logAxiosError(err);
-        throw new Error('❌ Failed to delete Resource Group.');
+async function waitForResourceGroupDeletion(token, retries = 10, delayMs = 5000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            await axios.get(`${AI_API_HOST}/v2/admin/resourceGroups/${resourceGroupId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log(`⏳ Resource Groupはまだ存在します... (${i + 1}/${retries})`);
+        } catch (err) {
+            if (err.response && err.response.status === 404) {
+                console.log('✅ Resource Groupは正常に削除されました！');
+                return;
+            }
+            logAxiosError(err);
+            throw err;
+        }
+        await new Promise(resolve => setTimeout(resolve, delayMs));
     }
+    throw new Error('⛔ Resource Groupは想定時間内に削除されませんでした。');
 }
 
 async function createResourceGroup(token) {
@@ -182,12 +175,30 @@ async function createResourceGroup(token) {
                 'Content-Type': 'application/json',
             },
         });
-        console.log('✅ Resource Group creation initialized!');
-        console.log('🔍 Response:', response.data);
+        console.log('✅ Resource Groupの作成を開始しました！');
+        console.log('🔍 レスポンス:', response.data);
     } catch (err) {
         logAxiosError(err);
         throw err;
     }
+}
+
+async function waitForResourceGroupReady(token, retries = 12, delayMs = 5000) {
+    for (let i = 0; i < retries; i++) {
+        const { status, statusMessage } = await getResourceGroupStatus(token);
+        if (status === 'PROVISIONED') {
+            console.log('✅ Resource Groupの準備が完了しました！');
+            return;
+        }
+        if (status === 'ERROR') {
+            console.error('❌ Resource GroupのステータスがERRORです');
+            console.error(`📝 エラーメッセージ: ${statusMessage || 'なし'}`);
+            throw new Error('Resource Groupの作成に失敗しました。');
+        }
+        console.log(`⏳ 準備が完了するのを待機中... (${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+    throw new Error('⛔ Resource Groupは時間内に準備完了になりませんでした。');
 }
 
 async function getResourceGroupStatus(token) {
@@ -199,9 +210,9 @@ async function getResourceGroupStatus(token) {
             },
         });
         const { status, statusMessage } = response.data;
-        console.log(`🔎 Current status: ${status}`);
+        console.log(`🔎 現在のステータス: ${status}`);
         if (statusMessage) {
-            console.log(`📝 Message: ${statusMessage}`);
+            console.log(`📝 メッセージ: ${statusMessage}`);
         }
         return { status, statusMessage };
     } catch (err) {
@@ -210,34 +221,16 @@ async function getResourceGroupStatus(token) {
     }
 }
 
-async function waitForResourceGroupReady(token, retries = 12, delayMs = 5000) {
-    for (let i = 0; i < retries; i++) {
-        const { status, statusMessage } = await getResourceGroupStatus(token);
-        if (status === 'PROVISIONED') {
-            console.log('✅ Resource Group is READY!');
-            return;
-        }
-        if (status === 'ERROR') {
-            console.error('❌ Resource Group status is ERROR');
-            console.error(`📝 Error Message: ${statusMessage || 'No message provided'}`);
-            throw new Error('Resource Group creation failed with status ERROR.');
-        }
-        console.log(`⏳ Waiting for READY... (${i + 1}/${retries})`);
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-    }
-    throw new Error('⛔ Resource Group did not become READY in time.');
-}
-
 async function createS3Secret(token) {
     const url = `${AI_API_HOST}/v2/admin/secrets`;
-    console.log(`🔑 S3 Secret loaded ${JSON.stringify(s3Info)}`);
+    console.log(`🔑 S3シークレットを読み込み中: ${JSON.stringify(s3Info)}`);
 
     const payload = {
         name: secretName,
         data: {
             url: Buffer.from(`https://${s3Info.bucketName}.s3.${s3Info.region}.amazonaws.com`).toString('base64'),
-            authentication: "Tm9BdXRoZW50aWNhdGlvbg==",
-            description: Buffer.from('Generic secret for accessing S3 bucket for grounding').toString('base64'),
+            authentication: Buffer.from('NoAuthentication').toString('base64'),
+            description: Buffer.from('Grounding用のS3シークレット').toString('base64'),
             access_key_id: Buffer.from(s3Info.accessKeyId).toString('base64'),
             secret_access_key: Buffer.from(s3Info.secretAccessKey).toString('base64'),
             bucket: Buffer.from(s3Info.bucketName).toString('base64'),
@@ -265,11 +258,11 @@ async function createS3Secret(token) {
                 'AI-Resource-Group': resourceGroupId,
             },
         });
-        console.log('✅ S3 Secret created');
-        console.log('🔍 Response:', response.data);
+        console.log('✅ S3シークレットを作成しました');
+        console.log('🔍 レスポンス:', response.data);
     } catch (err) {
         if (err.response && err.response.status === 409) {
-            console.log('ℹ️ S3 Secret already exists');
+            console.log('ℹ️ S3シークレットはすでに存在します');
         } else {
             logAxiosError(err);
             throw err;
@@ -278,52 +271,53 @@ async function createS3Secret(token) {
 }
 
 function logAxiosError(err) {
-    console.error('❌ Error occurred during request:');
+    console.error('❌ リクエスト中にエラーが発生しました:');
     if (err.config) {
         console.error(`📍 URL: ${err.config.url}`);
-        console.error(`📦 Method: ${err.config.method}`);
-        console.error(`📤 Data: ${JSON.stringify(err.config.data, null, 2)}`);
+        console.error(`📦 メソッド: ${err.config.method}`);
+        console.error(`📤 データ: ${JSON.stringify(err.config.data, null, 2)}`);
     }
     if (err.response) {
-        console.error(`🚨 Status: ${err.response.status}`);
-        console.error(`📨 Headers: ${JSON.stringify(err.response.headers, null, 2)}`);
-        console.error(`📨 Data: ${JSON.stringify(err.response.data, null, 2)}`);
+        console.error(`🚨 ステータス: ${err.response.status}`);
+        console.error(`📨 ヘッダー: ${JSON.stringify(err.response.headers, null, 2)}`);
+        console.error(`📨 データ: ${JSON.stringify(err.response.data, null, 2)}`);
     } else {
-        console.error(`⚠️ Message: ${err.message}`);
+        console.error(`⚠️ メッセージ: ${err.message}`);
     }
 }
 
-
 (async () => {
     try {
-        console.log('🔐 Getting access token...');
+        console.log('🔐 アクセストークンを取得しています...');
         const token = await getXsuaaToken();
 
         const { exists, status, statusMessage, labels } = await checkExistingResourceGroup(token);
 
         if (exists) {
             if (status === 'ERROR') {
-                console.warn(`❌ Resource Group is in ERROR state. Status message: ${statusMessage || 'None'}`);
-                const confirmDelete = await promptUserContinue('⚠️ Do you want to delete it? (yes/no): ');
+                console.warn(`❌ Resource GroupがERROR状態です。ステータスメッセージ: ${statusMessage || 'なし'}`);
+                const confirmDelete = await promptUserContinue('⚠️ 削除しますか？ (yes/no): ');
                 if (confirmDelete) {
                     await deleteResourceGroup(token);
-                    console.log('👋 Exiting after deletion. Please rerun the script to create it again.');
+                    console.log('🕵️ 削除の完了を確認中...');
+                    await waitForResourceGroupDeletion(token);
+                    console.log('👋 削除完了しました。再実行して作成してください。');
                     process.exit(0);
                 } else {
-                    console.log('🚫 Aborted by user.');
+                    console.log('🚫 ユーザーにより中断されました。');
                     return;
                 }
             }
 
             const hasGrounding = labels?.some(l => l.key === 'ext.ai.sap.com/document-grounding');
             if (!hasGrounding) {
-                console.log('ℹ️ Resource Group does NOT have document-grounding label.');
+                console.log('ℹ️ Resource Groupにはdocument-groundingラベルが付与されていません。');
                 const choice = await new Promise(resolve => {
                     const rl = readline.createInterface({
                         input: process.stdin,
                         output: process.stdout,
                     });
-                    rl.question('❓ What would you like to do?\n 1) PATCH to enable grounding\n 2) DELETE and exit\n 3) Skip and exit\nChoose [1/2/3]: ', answer => {
+                    rl.question('❓ 次の操作を選択してください:\n 1) Groundingを有効化 (PATCH)\n 2) 削除して終了\n 3) 何もしないで終了\n選択してください [1/2/3]: ', answer => {
                         rl.close();
                         resolve(answer.trim());
                     });
@@ -331,35 +325,36 @@ function logAxiosError(err) {
 
                 if (choice === '1') {
                     await patchResourceGroupWithGroundingLabel(token);
-                    console.log('⏳ Waiting 5 seconds before status monitoring...');
+                    console.log('⏳ PATCH後にステータス監視まで5秒待機...');
                     await new Promise(resolve => setTimeout(resolve, 5000));
-                    console.log('⏳ Monitoring status after PATCH...');
+                    console.log('⏳ PATCH後のステータスを監視中...');
                     await waitForResourceGroupReady(token);
                     await createS3Secret(token);
-                    console.log('🎉 Setup completed with patching!');
+                    console.log('🎉 PATCHを含めたセットアップが完了しました！');
                 } else if (choice === '2') {
                     await deleteResourceGroup(token);
-                    console.log('👋 Exiting after deletion. Please rerun the script to create it again.');
+                    console.log('🕵️ 削除の完了を確認中...');
+                    await waitForResourceGroupDeletion(token);
+                    console.log('👋 削除完了しました。再実行して作成してください。');
                     process.exit(0);
                 } else {
-                    console.log('🚫 Skipped by user. Exiting.');
+                    console.log('🚫 ユーザーによりスキップされました。終了します。');
                     return;
                 }
             } else {
-                console.log('✅ Resource Group already has document-grounding label.');
+                console.log('✅ Resource Groupにはすでにdocument-groundingラベルが付与されています。');
                 await waitForResourceGroupReady(token);
                 await createS3Secret(token);
-                console.log('🎉 All setup completed successfully!');
+                console.log('🎉 セットアップが正常に完了しました！');
             }
         } else {
             await createResourceGroup(token);
-            console.log('✅ Resource Group created.');
-            console.log('⏳ Monitoring resource group status...');
+            console.log('✅ Resource Groupを作成しました。');
+            console.log('⏳ Resource Groupのステータスを監視中...');
             await waitForResourceGroupReady(token);
-            console.log('⚠️ PATCH is not automatically applied. Please rerun the script to enable grounding if desired.');
+            console.log('⚠️ Groundingの有効化(PATCH)は自動では行われません。必要に応じて再実行してください。');
         }
     } catch (err) {
-        console.error('🔥 Setup failed.');
+        console.error('🔥 セットアップに失敗しました。');
     }
 })();
-
