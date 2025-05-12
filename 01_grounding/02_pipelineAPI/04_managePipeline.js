@@ -113,8 +113,7 @@ async function deletePipeline(token, pipelineId) {
             console.log('node 04_managePipeline.js get <pipelineId>');
             console.log('node 04_managePipeline.js status <pipelineId>');
             console.log('node 04_managePipeline.js delete <pipelineId>');
-            console.log('node 04_managePipeline.js executions <pipelineId>');
-            console.log('node 04_managePipeline.js executionDetail <pipelineId> <executionId>');
+            console.log('node 04_managePipeline.js executions <pipelineId> [executionId]');
             return;
         }
 
