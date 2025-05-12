@@ -77,6 +77,22 @@ async function getPipelineStatus(token, pipelineId) {
     console.log(JSON.stringify(response.data, null, 2));
 }
 
+// Pipeline Execution 一覧取得
+async function listExecutions(token, pipelineId) {
+    const url = `${AI_API_HOST}/v2/lm/document-grounding/pipelines/${pipelineId}/executions?lastExecution=false`;
+    const response = await axios.get(url, getRequestOptions(token));
+    console.log(`📋 Execution 一覧 [${pipelineId}]:`);
+    console.log(JSON.stringify(response.data, null, 2));
+}
+
+// Execution 詳細取得
+async function getExecutionDetail(token, pipelineId, executionId) {
+    const url = `${AI_API_HOST}/v2/lm/document-grounding/pipelines/${pipelineId}/executions/${executionId}`;
+    const response = await axios.get(url, getRequestOptions(token));
+    console.log(`📋 Execution 詳細 [Pipeline: ${pipelineId}, Execution: ${executionId}]:`);
+    console.log(JSON.stringify(response.data, null, 2));
+}
+
 // Pipeline 削除
 async function deletePipeline(token, pipelineId) {
     const url = `${AI_API_HOST}/v2/lm/document-grounding/pipelines/${pipelineId}`;
@@ -87,15 +103,18 @@ async function deletePipeline(token, pipelineId) {
 // 実行処理
 (async () => {
     try {
-        const action = process.argv[2];           // list / get / status / delete
-        const pipelineId = process.argv[3];       // オプション：get/status/delete用
+        const action = process.argv[2];           // list / get / status / delete / executions / executionDetail
+        const pipelineId = process.argv[3];       // 必要な場合
+        const executionId = process.argv[4];      // executionDetail 用
 
-        if (!action || !['list', 'get', 'status', 'delete'].includes(action)) {
+        if (!action || !['list', 'get', 'status', 'delete', 'executions', 'executionDetail'].includes(action)) {
             console.log('❌ 使用方法:');
             console.log('node 04_managePipeline.js list');
             console.log('node 04_managePipeline.js get <pipelineId>');
             console.log('node 04_managePipeline.js status <pipelineId>');
             console.log('node 04_managePipeline.js delete <pipelineId>');
+            console.log('node 04_managePipeline.js executions <pipelineId>');
+            console.log('node 04_managePipeline.js executionDetail <pipelineId> <executionId>');
             return;
         }
 
@@ -116,6 +135,14 @@ async function deletePipeline(token, pipelineId) {
             case 'delete':
                 if (!pipelineId) throw new Error('Pipeline ID が必要です');
                 await deletePipeline(token, pipelineId);
+                break;
+            case 'executions':
+                if (!pipelineId) throw new Error('Pipeline ID が必要です');
+                await listExecutions(token, pipelineId);
+                break;
+            case 'executionDetail':
+                if (!pipelineId || !executionId) throw new Error('Pipeline ID と Execution ID が必要です');
+                await getExecutionDetail(token, pipelineId, executionId);
                 break;
         }
 
