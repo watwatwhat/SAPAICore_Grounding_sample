@@ -34,9 +34,9 @@ const s3 = new AWS.S3({
 });
 
 // アップロード対象のファイル
-const filePath = path.join(__dirname, '../docs/SAP_BTP_Overview.pdf');
+const filePath = path.join(__dirname, '../docs/SAP_AI_Core_Overview.pdf');
 const fileContent = fs.readFileSync(filePath);
-const fileName = 'SAP_BTP_Overview.pdf';
+const fileName = 'SAP_AI_Core_Overview.pdf';
 
 // アップロードパラメータ
 const uploadParams = {
