@@ -138,11 +138,11 @@ async function deletePipeline(token, pipelineId) {
                 break;
             case 'executions':
                 if (!pipelineId) throw new Error('Pipeline ID が必要です');
-                await listExecutions(token, pipelineId);
-                break;
-            case 'executionDetail':
-                if (!pipelineId || !executionId) throw new Error('Pipeline ID と Execution ID が必要です');
-                await getExecutionDetail(token, pipelineId, executionId);
+                if (executionId) {
+                    await getExecutionDetail(token, pipelineId, executionId);
+                } else {
+                    await listExecutions(token, pipelineId);
+                }
                 break;
         }
 
