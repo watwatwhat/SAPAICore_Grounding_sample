@@ -1,6 +1,6 @@
 // ========================
 // 
-// Object Store経由のAmazon S3にグラウンディング対象のドキュメントをアップロードする
+// Object Store経由のAmazon S3にグラウンディング対象のドキュメントをアップロードする（ファイル名を引数で指定）
 // 
 // ========================
 
@@ -23,6 +23,25 @@ const s3Info = {
     username: s3Creds.username,
 };
 
+// コマンドライン引数からファイル名を取得
+const fileName = process.argv[2];
+
+if (!fileName) {
+    console.error('❌ ファイル名を指定してください:');
+    console.log('例: node 02_uploadDocs.js SAP_AI_Core_Overview.pdf');
+    process.exit(1);
+}
+
+// ファイルパスと内容
+const filePath = path.join(__dirname, '../docs', fileName);
+
+if (!fs.existsSync(filePath)) {
+    console.error(`❌ ファイルが見つかりません: ${filePath}`);
+    process.exit(1);
+}
+
+const fileContent = fs.readFileSync(filePath);
+
 // AWS S3 クライアントの設定
 const s3 = new AWS.S3({
     accessKeyId: s3Info.accessKeyId,
@@ -32,11 +51,6 @@ const s3 = new AWS.S3({
     signatureVersion: 'v4',
     s3ForcePathStyle: true,
 });
-
-// アップロード対象のファイル
-const filePath = path.join(__dirname, '../docs/SAP_AI_Core_Overview.pdf');
-const fileContent = fs.readFileSync(filePath);
-const fileName = 'SAP_AI_Core_Overview.pdf';
 
 // アップロードパラメータ
 const uploadParams = {
@@ -59,7 +73,7 @@ s3.upload(uploadParams, (err, data) => {
     const signedUrl = s3.getSignedUrl('getObject', {
         Bucket: s3Info.bucketName,
         Key: fileName,
-        Expires: 3600, // 秒数（例: 3600秒 = 1時間）
+        Expires: 3600,
     });
 
     console.log('⏳ 署名付きURL (1時間有効):');
