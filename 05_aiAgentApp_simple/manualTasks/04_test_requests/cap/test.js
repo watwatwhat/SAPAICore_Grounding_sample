@@ -1,53 +1,66 @@
 const path = require('path');
-
 require('dotenv').config({ path: path.join(__dirname, '../../../cap/.env') });
 
 const { executeHttpRequest } = require('@sap-cloud-sdk/core');
 const { getDestination } = require("@sap-cloud-sdk/connectivity");
 const readline = require('readline');
 
-// Destination名を指定（BTP Cockpitで設定している名前）
 const DESTINATION_NAME = 'aiagentsample-simple-deepdiveXXX-cap-srv';
 
-// GETリクエスト
 async function callGetFromDestination() {
     try {
         const capDestination = await getDestination({ destinationName: DESTINATION_NAME });
-        const response = await executeHttpRequest(capDestination,
-            {
-                method: 'GET',
-                url: '/odata/v4/GPT/QahistoryView'
-            }
-        );
+        const response = await executeHttpRequest(capDestination, {
+            method: 'GET',
+            url: '/odata/v4/GPT/QahistoryView'
+        });
         console.log('✅ GET成功:', response.data);
     } catch (err) {
         console.error('❌ GET失敗:', err.message);
     }
 }
 
-// POSTリクエスト
 async function callPostToDestination() {
+    const dataList = [
+        {
+            question: "SAP HANAとは何ですか？",
+            answer: "SAP HANAはインメモリデータベース管理システムです。",
+            metadata: JSON.stringify({ source: "FAQ", created_by: "admin" })
+        },
+        {
+            question: "SAP AI LaunchpadでGenerative AI Hubが表示されないのはなぜ？",
+            answer: "表示されていない原因としては、権限がない、もしくは接続しているSAP AI CoreのインスタンスのプランがExtendedでない可能性があります。",
+            metadata: JSON.stringify({ source: "Documentation", created_by: "admin" })
+        },
+        {
+            question: "SAP CAPとは？",
+            answer: "SAP Cloud Application Programming Model（CAP）は、効率的なクラウドアプリ開発を支援するフレームワークです。",
+            metadata: JSON.stringify({ source: "Guide", created_by: "admin" })
+        },
+        {
+            question: "ODataとは？",
+            answer: "ODataはRESTベースのデータアクセスプロトコルです。",
+            metadata: JSON.stringify({ source: "Documentation", created_by: "admin" })
+        }
+    ];
+
     try {
         const capDestination = await getDestination({ destinationName: DESTINATION_NAME });
-        const response = await executeHttpRequest(capDestination,
-            {
+
+        for (const [index, data] of dataList.entries()) {
+            const response = await executeHttpRequest(capDestination, {
                 method: 'POST',
                 url: '/odata/v4/GPT/QahistoryView',
                 headers: { 'Content-Type': 'application/json' },
-                data: {
-                    question: "SAP HANAとは何ですか？",
-                    answer: "SAP HANAはインメモリデータベース管理システムです。",
-                    metadata: JSON.stringify({ source: "FAQ", created_by: "admin" })
-                }
-            }
-        );
-        console.log('✅ POST成功:', response.data);
+                data: data
+            });
+            console.log(`✅ POST成功（${index + 1}件目）:`, response.data);
+        }
     } catch (err) {
         console.error('❌ POST失敗:', err.message);
     }
 }
 
-// CLIで操作選択
 function promptUser() {
     const rl = readline.createInterface({
         input: process.stdin,
@@ -66,5 +79,4 @@ function promptUser() {
     });
 }
 
-// 実行
 promptUser();
