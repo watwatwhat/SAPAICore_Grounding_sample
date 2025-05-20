@@ -14,7 +14,7 @@
 
 ### 1. 事前準備
 
-1. WorkSpaceに入り、「deepdiveXXX」を「deepdive011」（ご自身の任意の一意のID）に全文置換する
+1. WorkSpaceに入り、「deepdiveXxX」（← 大文字Xが3つ。置換防止のために真ん中を小文字xにしている）を「deepdiveXXX」（ご自身の任意の一意のID）に全文置換する
 2. AI Coreのデフォルト（default_aicore）のサービスキーをai_core_sk.jsonにコピペする
 3. Object Store on SAP BTP のインスタンスを立てる
    - SAP AI Core のGrounding　機能では、現状 Amazon S3 等をサポートしている。Amazon S3互換のオブジェクトストレージとして、今回は Object Store on SAP BTP を利用します。
@@ -334,14 +334,66 @@
    ```
    node 04_vectorAPI/07_manageCollection.js create folkTale text-embedding-ada-002
    ```
+   - このスクリプトはSAP AI CoreのVector APIを使用してコレクション（データリポジトリ）を作成します。
+   ```js
+   async function createCollection(token, title, embeddingModelName) {
+       const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections`;
+       const payload = {
+           title: title,
+           embeddingConfig: {
+               modelName: embeddingModelName
+           },
+           metadata: [
+               { key: "purpose", value: ["demo"] },
+               { key: "project", value: ["DeepDive2025"] }
+           ]
+       };
+       const res = await axios.post(url, payload, getRequestOptions(token));
+       console.log(`✅ コレクション作成成功: ${res.data.id}`);
+   }
+   ```
 2. AI Launchpadからデータリポジトリが作成されたことを確認
 3. データリポジトリのIDを取得
    ```
    node 04_vectorAPI/07_manageCollection.js list
    ```
+   - このコマンドで作成されたコレクションの一覧とIDが表示されます。
+   ```js
+   async function listCollections(token) {
+       const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections`;
+       const res = await axios.get(url, getRequestOptions(token));
+       console.log('📚 コレクション一覧:\n', JSON.stringify(res.data, null, 2));
+   }
+   ```
 4. ドキュメントを登録
    ```
    node 04_vectorAPI/08_manageDocument.js create <RepositoryID> docs/Momotaro.txt
+   ```
+   - このスクリプトは物語のテキストをチャンク（断片）に分割して、ベクトルDBに保存します。
+   ```js
+   async function createDocument(token, collectionId, filePath) {
+       const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections/${collectionId}/documents`;
+       const rawText = fs.readFileSync(filePath, 'utf8');
+       const chunks = [];
+       for (let i = 0; i < rawText.length; i += CHUNK_SIZE) {
+           chunks.push({
+               content: rawText.substring(i, i + CHUNK_SIZE),
+               metadata: [{ key: "index", value: [(i / CHUNK_SIZE + 1).toString()] }]
+           });
+       }
+       const payload = {
+           documents: [
+               {
+                   metadata: [
+                       { key: "source", value: [path.basename(filePath)] }
+                   ],
+                   chunks: chunks
+               }
+           ]
+       };
+       const res = await axios.post(url, payload, getRequestOptions(token));
+       console.log('✅ ドキュメント作成成功:\n', JSON.stringify(res.data, null, 2));
+   }
    ```
 
 ### 4. SearchAPI（とVector API）を介した関連文書の抽出
@@ -351,6 +403,27 @@
    node 04_vectorAPI/08_manageDocument.js search "桃から生まれる" <RepositoryID>
    ```
    - シェル内での編集が難しい場合は、ツールバーか別の場所で編集してペースト
+   - このスクリプトは、ベクトル検索を使って関連する文書を取得します。
+   ```js
+   async function vectorSearch(token, query, collectionId) {
+       const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/search`;
+       const payload = {
+           query: query,
+           filters: [
+               {
+                   id: "search-1",
+                   collectionIds: [collectionId],
+                   configuration: {},
+                   documentMetadata: [],
+                   chunkMetadata: [],
+                   collectionMetadata: []
+               }
+           ]
+       };
+       const res = await axios.post(url, payload, getRequestOptions(token));
+       console.log('🔍 検索結果:\n', JSON.stringify(res.data, null, 2));
+   }
+   ```
 2. 関連する文書が抽出されたことを確認
 
 ### 5. AI LaunchpadのRun Search機能からの抽出
@@ -373,9 +446,88 @@
    ```
    node 01_prerequisites/01_createOrchDeployment.js deploy
    ```
+   - このスクリプトは、オーケストレーション用のConfiguration（構成）とDeployment（デプロイメント）を作成します。
+   ```js
+   // Configuration作成
+   async function createConfiguration(token) {
+     const url = `${AI_API_HOST}/v2/lm/configurations`;
+     const payload = {
+       name: "orchestration-config",
+       executableId: "orchestration",
+       scenarioId: "orchestration"
+     };
+
+     const res = await axios.post(url, payload, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+         'ai-resource-group': resourceGroupId,
+         'Content-Type': 'application/json'
+       }
+     });
+
+     console.log("✅ Configuration 作成完了:", res.data.id);
+     return res.data.id;
+   }
+
+   // Deployment作成
+   async function createDeployment(token, configurationId) {
+     const url = `${AI_API_HOST}/v2/lm/deployments`;
+     const payload = {
+       configurationId
+     };
+
+     const res = await axios.post(url, payload, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+         'ai-resource-group': resourceGroupId,
+         'Content-Type': 'application/json'
+       }
+     });
+
+     const deploymentId = res.data.id;
+     console.log("🚀 Deployment スケジュール完了:", deploymentId);
+
+     // orchDeploymentId を保存
+     const currentVars = JSON.parse(fs.readFileSync(userDefinedPath, 'utf8'));
+     currentVars.orchDeploymentId = deploymentId;
+     fs.writeFileSync(userDefinedPath, JSON.stringify(currentVars, null, 2), 'utf8');
+     console.log("💾 orchDeploymentId を user_defined_variable.json に保存しました。");
+
+     return deploymentId;
+   }
+   ```
 4. 作成の進捗状況を確認
    ```
    node 01_prerequisites/01_createOrchDeployment.js check
+   ```
+   - このコマンドでデプロイメントの状態を確認します。「RUNNING」状態になれば利用可能です。
+   ```js
+   async function checkDeploymentStatus(token, deploymentId) {
+     const url = `${AI_API_HOST}/v2/lm/deployments/${deploymentId}`;
+     const res = await axios.get(url, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+         'ai-resource-group': resourceGroupId
+       }
+     });
+
+     const status = res.data.status;
+     console.log(`📊 Deployment ステータス: ${status}`);
+
+     if (status === "RUNNING") {
+       const deploymentUrl = res.data.deploymentUrl;
+       console.log("🌐 Deployment URL:", deploymentUrl);
+
+       // orchDeploymentUrl を保存
+       const currentVars = JSON.parse(fs.readFileSync(userDefinedPath, 'utf8'));
+       currentVars.orchDeploymentUrl = deploymentUrl;
+       fs.writeFileSync(userDefinedPath, JSON.stringify(currentVars, null, 2), 'utf8');
+       console.log("💾 orchDeploymentUrl を user_defined_variable.json に保存しました。");
+
+     } else {
+       console.log("⏳ まだRUNNINGではありません。数分後に再度確認してください。");
+     }
+   }
    ```
 
 ### 2. Orchestrationを作成
@@ -413,5 +565,60 @@
 3. APIからOrchestrationを実行
    ```
    node 02_orchestration/01_callOrchEndpoint.js "桃から生まれたのは誰？"
+   ```
+   - このスクリプトは、SAP AI CoreのOrchestrationエンドポイントを呼び出して、RAGパイプラインを実行します。
+   ```js
+   // Orchestrationエンドポイント呼び出し
+   async function callOrchestrationCompletion(token, userInputParams) {
+     const url = `${deploymentUrl}/completion`;
+     const payload = {
+       orchestration_config: orchestrationConfig,
+       input_params: userInputParams,
+     };
+
+     const res = await axios.post(url, payload, {
+       headers: {
+         Authorization: `Bearer ${token}`,
+         'ai-resource-group': resourceGroupId,
+         'Content-Type': 'application/json'
+       },
+     });
+
+     console.log("✅ 応答:");
+     console.dir(res.data, { depth: null });
+   }
+
+   // 実行処理
+   (async () => {
+     try {
+       const input = process.argv[2];
+
+       if (!input) {
+         console.error("❌ 質問が指定されていません。");
+         console.log("✅ 使用方法:");
+         console.log('node ./02_orchestration/02_orchestration/01_callOrchCompletion.js <question>');
+         console.log('例: node ./02_orchestration/02_orchestration/01_callOrchEndpoint.js "桃から生まれたのは誰？"');
+         process.exit(1);
+       }
+
+       console.log("🔐 トークン取得中...");
+       const token = await getXsuaaToken();
+
+       const inputParams = {
+         question: input
+       };
+
+       console.log("📡 Orchestration 呼び出し中...");
+       await callOrchestrationCompletion(token, inputParams);
+
+     } catch (err) {
+       if (err.response) {
+         console.error("❌ エラー:", err.response.status, err.response.statusText);
+         console.error(err.response.data);
+       } else {
+         console.error("❌ エラー:", err.message);
+       }
+     }
+   })();
    ```
 4. Orchestration経由でGroundingし、LLMの回答（RAG）が返されることを確認
