@@ -7,7 +7,7 @@
 3. Build CodeのFullStackのWorkSpaceを作る（このWorkSpace作成時に作成されるプロジェクトは使わないが、一旦Node.jsプロジェクトにしておく）
 4. getStarted からgithubのリポジトリをcloneする
    ```
-   https://github.com/watwatwhat/SAPAICore_Grounding_sample.git
+   https://github.com/sapwatwatwhat/BTPHackathon2025_deepdive1.git
    ```
 
 ## 01_grounding の手順
