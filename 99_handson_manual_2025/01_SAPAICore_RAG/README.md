@@ -539,13 +539,15 @@
    - Data Repositoriesで「folkTale」を選択
    - Max 3 Chunksに設定
 4. Templateモジュールの設定
-   - Messagesにて、以下のメッセージをUserプロンプトとして追加
+   - Messagesにて、以下のメッセージを`System`プロンプトとして追加
    ```
    You are a helpful assistant.
    Please respond to user's question based on related contexts.
-
-   User's question: {{?question}}
    Related contexts are as follows: {{?related_fragments}}
+   ```
+   - `User`プロンプトとして、下記のメッセージを追加
+   ```
+   User's question: {{?question}}
    ```
 5. Model Configurationモジュール
    - gpt-4o (2024-05-13) を選択
