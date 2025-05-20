@@ -545,9 +545,9 @@
    Please respond to user's question based on related contexts.
    Related contexts are as follows: {{?related_fragments}}
    ```
-   - `User`プロンプトとして、下記のメッセージを追加
+   - `User`プロンプトとして、下記のメッセージを追加。OrchestrationのAPIの入力となるquestionをそのまま渡している状態。
    ```
-   User's question: {{?question}}
+   {{?question}}
    ```
 5. Model Configurationモジュール
    - gpt-4o (2024-05-13) を選択
