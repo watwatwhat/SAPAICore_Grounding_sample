@@ -1,5 +1,9 @@
 # RAGハンズオン手順書
 
+## デモ動画
+以下のYouTubeリンクでハンズオンのデモをご覧いただけます：
+[![Grounding デモ動画](https://img.youtube.com/vi/vExXOQprhXk/0.jpg)](https://youtu.be/vExXOQprhXk)
+
 ## 準備
 
 1. BTP Cockpitのグローバルアカウントの画面から、ハンズオン用のサブアカウントにObject Storeのエンタイトルメントを追加する
@@ -433,6 +437,10 @@
 3. 類似の結果が得られることを確認
 
 ## 02_orchestration の手順
+
+## デモ動画
+以下のYouTubeリンクでOrchestrationのデモをご覧いただけます：
+[![Orchestration デモ動画](https://img.youtube.com/vi/crbT2v8LVlU/0.jpg)](https://youtu.be/crbT2v8LVlU)
 
 ### 1. 事前準備
 

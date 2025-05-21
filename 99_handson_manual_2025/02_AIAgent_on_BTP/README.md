@@ -1,5 +1,9 @@
 # AI Agent ハンズオン手順書
 
+## デモ動画
+以下のYouTubeリンクでAI Agentのデモをご覧いただけます：
+[![AI Agent デモ動画](https://img.youtube.com/vi/U7Z9AH0B458/0.jpg)](https://youtu.be/U7Z9AH0B458)
+
 このハンズオンでは、SAP BTPでAI Agentをホストする方法を学びます。CAP（Cloud Application Programming）アプリケーションとPythonベースのLangChainフレームワークを組み合わせて、知識DBとAI Agentを構築します。
 
 ## CAP（知識DBへのデータの出し入れを担当）
