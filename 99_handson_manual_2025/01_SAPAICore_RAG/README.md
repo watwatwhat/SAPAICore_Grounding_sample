@@ -35,9 +35,8 @@
    npm install
    node 01_prerequisites/01_prerequisites.js
    ```
-   - このコードは、まず SAP AI Core の「deepdiveXXX」という名前のリソースグループを検索し、なければ作成するという内容になっています。
+   - このコードは、まず SAP AI Core の「deepdiveXXX」という名前のリソースグループを検索し、なければ作成するという内容になっています。([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
    ```js
-    ([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
     async function createResourceGroup(token) {
         const url = `${AI_API_HOST}/v2/admin/resourceGroups`;
         const payload = { resourceGroupId };
@@ -67,9 +66,8 @@
    node 01_prerequisites/01_prerequisites.js
    ```
    - インタラクティブなスクリプトなので、表示されたメニューから1を選択してGroundingを有効化してください。
-   - このコードでは、下記のように、`ext.ai.sap.com/document-grounding`ラベルを含むPATCHリクエストをリソースグループに対して送ることで、当該リソースグループのGrounding機能を有効化します。
+   - このコードでは、下記のように、`ext.ai.sap.com/document-grounding`ラベルを含むPATCHリクエストをリソースグループに対して送ることで、当該リソースグループのGrounding機能を有効化します。([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
    ```js
-    ([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
     async function patchResourceGroupWithGroundingLabel(token) {
         const url = `${AI_API_HOST}/v2/admin/resourceGroups/${resourceGroupId}`;
         const payload = {
@@ -103,8 +101,8 @@
 9. 上記のリクエストが無事完了したら、SAP AI Launchpadから`Grounding Management`のタブが追加されたことと、`Generic Secrets`にシークレットキーが追加されたことを確認する
     - このシークレットは、Object Store on SAP BTPのサービスキーから取得された内容を持っており、Grounding機能がObject Store on SAP BTP にアクセスする際に利用される。
     - 当該のシークレットキー登録は下記のようにAPI経由で行われている。
-    ```js
     ([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
+    ```js
     async function createS3Secret(token) {
         const url = `${AI_API_HOST}/v2/admin/secrets`;
         console.log(`🔑 S3シークレットを読み込み中 ...`);
@@ -178,8 +176,8 @@
    ```
     - この際には、AWS SDK for JavaScriptを用いてアップロードが行われている。
     - 1時間の事前署名付きのURL（アップロードしたpdfを無認証で閲覧できるURL）が出力される。
-   ```js
     ([01_grounding/02_pipelineAPI/02_uploadDocs.js](../../01_grounding/02_pipelineAPI/02_uploadDocs.js))
+   ```js
     // AWS S3 クライアントの設定
     const s3 = new AWS.S3({
         accessKeyId: s3Info.accessKeyId,
