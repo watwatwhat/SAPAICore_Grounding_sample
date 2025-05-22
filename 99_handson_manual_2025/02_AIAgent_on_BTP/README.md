@@ -11,6 +11,8 @@
 このAI Agentアプリケーションは、SAP BTP上でアプリケーションを開発する際に利用するMulti Target Application(MTA)というフレームワークに基づいて構成されている。
 このMTAは、マイクロサービスを利用してアプリケーションを構成し、いくつかのサービスをまとめて一つのアプリケーションとして管理できる仕組みである。
 
+![AI Agent アプリケーション概要](assets/00_Overview.png)
+
 例えば、今回の場合は`mta.yaml`というファイルに構成情報が記載されており、主要な部分を抜粋すると、下記のようになる。
 
 ```yaml
@@ -399,6 +401,43 @@
    ```
    - 新規データが追加されてDBに流し込まれることを確認
    - 必要に応じて異なるデータでテスト
+   - この時、CAP側では下記のEvent Handlerが発火する。([05_aiAgentApp_simple/cap/srv/service.js](../../05_aiAgentApp_simple/cap/srv/service.js))
+   ```js
+    this.after(['CREATE', 'UPDATE'], 'QahistoryView', async (qa) => {
+        await embedQuestion(qa);
+    });
+
+    const embedQuestion = async function (qa) {
+        console.log(`================ Embedding Question: ${qa.ID} ================ `);
+        const vectorplugin = await cds.connect.to("cap-llm-plugin");
+        try {
+            const mergedQa = `
+                Q. ${qa.question}
+                A. ${qa.answer}
+            `
+            // $batchで流し込むとembedding APIのコールが早すぎてエラーになるので待機
+            console.log("WILL EMBED!");
+            await timeout(timeout_milisec);
+            const embedding = await vectorplugin.getEmbedding(mergedQa);
+            console.log("EMBEDDED!");
+            console.log(embedding);
+            console.log("I'm about to run tx.run");
+            const updatedData = {
+                "mergedqa": mergedQa,
+                "custom_embedding": array2VectorBuffer(embedding)
+            };
+            console.log(updatedData);
+            const embeddingBuffer = array2VectorBuffer(embedding);
+            await cds.run(`
+                UPDATE "GPTSERVICE_QAHISTORY"
+                SET "MERGEDQA" = ?, "CUSTOM_EMBEDDING" = ?
+                WHERE "ID" = ?
+              `, [mergedQa, embeddingBuffer, qa.ID]);
+        } catch (error) {
+            throw error;
+        }
+    }
+   ```
 
 2. 登録データの確認
    ```
