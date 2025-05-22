@@ -1,5 +1,22 @@
 # RAGハンズオン手順書
 
+## 目次
+- [デモ動画](#デモ動画)
+- [概要](#概要)
+- [準備](#準備)
+- [01_grounding の手順](#01_grounding-の手順)
+  - [1. 事前準備](#1-事前準備)
+  - [2. パイプラインの作成 -> 自動Embed](#2-パイプラインの作成---自動embed)
+  - [3. Vector APIを介した手動Embed](#3-vector-apiを介した手動embed)
+  - [4. SearchAPI（とVector API）を介した関連文書の抽出](#4-searchapiとvector-apiを介した関連文書の抽出)
+  - [5. AI LaunchpadのRun Search機能からの抽出](#5-ai-launchpadのrun-search機能からの抽出)
+- [02_orchestration の手順](#02_orchestration-の手順)
+  - [デモ動画](#デモ動画-1)
+  - [1. 事前準備](#1-事前準備-1)
+  - [2. Orchestrationを作成](#2-orchestrationを作成)
+  - [3. Orchestrationをテスト実行](#3-orchestrationをテスト実行)
+  - [4. APIからOrchestrationを実行](#4-apiからorchestrationを実行)
+
 ## デモ動画
 以下のYouTubeリンクでハンズオンのデモをご覧いただけます：
 

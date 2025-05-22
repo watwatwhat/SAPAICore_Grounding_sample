@@ -2,6 +2,24 @@
 
 このリポジトリには、SAP AI Coreを使用してAIモデルを管理・実行するためのサンプルコードが含まれています。
 
+> [!TIP]
+> ## ハンズオンマニュアル
+>
+> ハンズオンの進め方は以下のマニュアルを参照してください：
+>
+> ### RAGハンズオン
+> [RAGハンズオン手順書](99_handson_manual_2025/01_SAPAICore_RAG/README.md)
+>
+> #### デモ動画
+> [![Grounding デモ動画](https://img.youtube.com/vi/vExXOQprhXk/0.jpg)](https://youtu.be/vExXOQprhXk)
+> [![Orchestration デモ動画](https://img.youtube.com/vi/crbT2v8LVlU/0.jpg)](https://youtu.be/crbT2v8LVlU)
+>
+> ### AI Agentハンズオン
+> [AI Agent ハンズオン手順書](99_handson_manual_2025/02_AIAgent_on_BTP/README.md)
+>
+> #### デモ動画
+> [![AI Agent デモ動画](https://img.youtube.com/vi/U7Z9AH0B458/0.jpg)](https://youtu.be/U7Z9AH0B458)
+
 ## ディレクトリ構成
 
 - `01_grounding/` - ドキュメントグラウンディングのサンプルコード
@@ -60,23 +78,6 @@ SAP HANA Cloud, Vector Engineによるベクトル化の機能を取り除き、
 1. `ai_core_sk.json` - SAP AI Coreのサービスキー
 2. `object_store_sk.json` - Object Store (S3) のサービスキー
 3. `user_defined_variable.json` - ユーザー定義変数（リソースグループIDとシークレット名）
-
-## ハンズオンマニュアル
-
-ハンズオンの進め方は以下のマニュアルを参照してください：
-
-### RAGハンズオン
-[RAGハンズオン手順書](99_handson_manual_2025/01_SAPAICore_RAG/README.md)
-
-#### デモ動画
-[![Grounding デモ動画](https://img.youtube.com/vi/vExXOQprhXk/0.jpg)](https://youtu.be/vExXOQprhXk)
-[![Orchestration デモ動画](https://img.youtube.com/vi/crbT2v8LVlU/0.jpg)](https://youtu.be/crbT2v8LVlU)
-
-### AI Agentハンズオン
-[AI Agent ハンズオン手順書](99_handson_manual_2025/02_AIAgent_on_BTP/README.md)
-
-#### デモ動画
-[![AI Agent デモ動画](https://img.youtube.com/vi/U7Z9AH0B458/0.jpg)](https://youtu.be/U7Z9AH0B458)
 
 ## 実行手順
 
