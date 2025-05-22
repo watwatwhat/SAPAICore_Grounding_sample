@@ -5,6 +5,11 @@
 
 [![Grounding デモ動画](https://img.youtube.com/vi/vExXOQprhXk/0.jpg)](https://youtu.be/vExXOQprhXk)
 
+## 概要
+このハンズオンでは、SAP AI CoreのGrounding機能とOrchestration機能を用いて、RAGエンドポイントを作成します。
+大きな俯瞰図は下記のとおりです。
+![RAGエンドポイント作成概要](assets/00_Overview.png)
+
 ## 準備
 
 1. BTP Cockpitのグローバルアカウントの画面から、ハンズオン用のサブアカウントにObject Storeのエンタイトルメントを追加する
