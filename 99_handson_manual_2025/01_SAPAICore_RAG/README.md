@@ -32,6 +32,7 @@
    ```
    - このコードは、まず SAP AI Core の「deepdiveXXX」という名前のリソースグループを検索し、なければ作成するという内容になっています。
    ```js
+    ([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
     async function createResourceGroup(token) {
         const url = `${AI_API_HOST}/v2/admin/resourceGroups`;
         const payload = { resourceGroupId };
@@ -63,6 +64,7 @@
    - インタラクティブなスクリプトなので、表示されたメニューから1を選択してGroundingを有効化してください。
    - このコードでは、下記のように、`ext.ai.sap.com/document-grounding`ラベルを含むPATCHリクエストをリソースグループに対して送ることで、当該リソースグループのGrounding機能を有効化します。
    ```js
+    ([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
     async function patchResourceGroupWithGroundingLabel(token) {
         const url = `${AI_API_HOST}/v2/admin/resourceGroups/${resourceGroupId}`;
         const payload = {
@@ -97,6 +99,7 @@
     - このシークレットは、Object Store on SAP BTPのサービスキーから取得された内容を持っており、Grounding機能がObject Store on SAP BTP にアクセスする際に利用される。
     - 当該のシークレットキー登録は下記のようにAPI経由で行われている。
     ```js
+    ([01_grounding/01_prerequisites/01_prerequisites.js](../../01_grounding/01_prerequisites/01_prerequisites.js))
     async function createS3Secret(token) {
         const url = `${AI_API_HOST}/v2/admin/secrets`;
         console.log(`🔑 S3シークレットを読み込み中 ...`);
@@ -170,7 +173,8 @@
    ```
     - この際には、AWS SDK for JavaScriptを用いてアップロードが行われている。
     - 1時間の事前署名付きのURL（アップロードしたpdfを無認証で閲覧できるURL）が出力される。
-    ```js
+   ```js
+    ([01_grounding/02_pipelineAPI/02_uploadDocs.js](../../01_grounding/02_pipelineAPI/02_uploadDocs.js))
     // AWS S3 クライアントの設定
     const s3 = new AWS.S3({
         accessKeyId: s3Info.accessKeyId,
@@ -220,6 +224,7 @@
    ```
     - このスクリプトでは、S3タイプのリポジトリ（ドキュメントの格納庫）に対して、SAP AI CoreのAPI経由でパイプラインを作成している。これにより、そこに格納されている文書が定期的（現時点では1回/日）にクロールされるようになる。
     ```js
+    ([01_grounding/02_pipelineAPI/03_createPipeline.js](../../01_grounding/02_pipelineAPI/03_createPipeline.js))
     async function createS3Pipeline(token) {
         const url = `${AI_API_HOST}/v2/lm/document-grounding/pipelines`;
 
@@ -291,6 +296,7 @@
    ```
     - このスクリプトでも、SAP AI CoreのAPI経由で検索を行っている。
     ```js
+    ([01_grounding/03_retrievalAPI/06_searchRetrieval.js](../../01_grounding/03_retrievalAPI/06_searchRetrieval.js))
     async function searchRetrieval(token, query, repositoryId = '*', maxChunkCount = 3) {
         const url = `${AI_API_HOST}/v2/lm/document-grounding/retrieval/search`;
 
@@ -341,6 +347,7 @@
    ```
    - このスクリプトはSAP AI CoreのVector APIを使用してコレクション（データリポジトリ）を作成します。
    ```js
+   ([01_grounding/04_vectorAPI/07_manageCollection.js](../../01_grounding/04_vectorAPI/07_manageCollection.js))
    async function createCollection(token, title, embeddingModelName) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections`;
        const payload = {
@@ -364,6 +371,7 @@
    ```
    - このコマンドで作成されたコレクションの一覧とIDが表示されます。
    ```js
+   ([01_grounding/04_vectorAPI/07_manageCollection.js](../../01_grounding/04_vectorAPI/07_manageCollection.js))
    async function listCollections(token) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections`;
        const res = await axios.get(url, getRequestOptions(token));
@@ -376,6 +384,7 @@
    ```
    - このスクリプトは物語のテキストをチャンク（断片）に分割して、ベクトルDBに保存します。
    ```js
+   ([01_grounding/04_vectorAPI/08_manageDocument.js](../../01_grounding/04_vectorAPI/08_manageDocument.js))
    async function createDocument(token, collectionId, filePath) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections/${collectionId}/documents`;
        const rawText = fs.readFileSync(filePath, 'utf8');
@@ -410,6 +419,7 @@
    - シェル内での編集が難しい場合は、ツールバーか別の場所で編集してペースト
    - このスクリプトは、ベクトル検索を使って関連する文書を取得します。
    ```js
+   ([01_grounding/04_vectorAPI/08_manageDocument.js](../../01_grounding/04_vectorAPI/08_manageDocument.js))
    async function vectorSearch(token, query, collectionId) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/search`;
        const payload = {
@@ -458,6 +468,7 @@
    ```
    - このスクリプトは、オーケストレーション用のConfiguration（構成）とDeployment（デプロイメント）を作成します。
    ```js
+   ([02_orchestration/01_prerequisites/01_createOrchDeployment.js](../../02_orchestration/01_prerequisites/01_createOrchDeployment.js))
    // Configuration作成
    async function createConfiguration(token) {
      const url = `${AI_API_HOST}/v2/lm/configurations`;
@@ -512,6 +523,7 @@
    ```
    - このコマンドでデプロイメントの状態を確認します。「RUNNING」状態になれば利用可能です。
    ```js
+   ([02_orchestration/01_prerequisites/01_createOrchDeployment.js](../../02_orchestration/01_prerequisites/01_createOrchDeployment.js))
    async function checkDeploymentStatus(token, deploymentId) {
      const url = `${AI_API_HOST}/v2/lm/deployments/${deploymentId}`;
      const res = await axios.get(url, {
@@ -580,6 +592,7 @@
    ```
    - このスクリプトは、SAP AI CoreのOrchestrationエンドポイントを呼び出して、RAGパイプラインを実行します。
    ```js
+   ([02_orchestration/02_orchestration/01_callOrchEndpoint.js](../../02_orchestration/02_orchestration/01_callOrchEndpoint.js))
    // Orchestrationエンドポイント呼び出し
    async function callOrchestrationCompletion(token, userInputParams) {
      const url = `${deploymentUrl}/completion`;

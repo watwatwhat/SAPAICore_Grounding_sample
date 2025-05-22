@@ -217,6 +217,7 @@
    - このスクリプトではまず、LLMモデルをデプロイするためのConfiguration（構成）を作成します：
    ```js
    // Configurationの作成
+   ([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js))
    async function createConfiguration(token, modelName, modelVersion, modelType) {
      const url = `${AI_API_HOST}/v2/lm/configurations`;
      const payload = {
@@ -255,29 +256,31 @@
    - 次に、作成したConfigurationを使用してデプロイメントを作成します：
    ```js
    // Deploymentの作成
-   async function createDeployment(token, configurationId, modelName, modelType) {
+   ([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js))
+   async function createDeployment(token, configurationId) {
      const url = `${AI_API_HOST}/v2/lm/deployments`;
      const payload = {
-       configurationId,
-       deploymentTemplateId: `foundation-models-${modelName}-latest`,
-       resourceGroupId
+       configurationId
      };
-     
+
      const res = await axios.post(url, payload, {
        headers: {
          Authorization: `Bearer ${token}`,
-         'Content-Type': 'application/json',
-         'AI-Resource-Group': resourceGroupId
+         'ai-resource-group': resourceGroupId,
+         'Content-Type': 'application/json'
        }
      });
-     
-     // 作成したDeploymentのIDを保存
-     userCreds[`${modelType}Model_deploymentId`] = res.data.id;
-     fs.writeFileSync(userCredsPath, JSON.stringify(userCreds, null, 2));
-     console.log('✅ Deployment created:', res.data.id);
-     console.log('🔍 Now inspecting deployment status. Wait for it to be ready...');
 
-     return res.data.id;
+     const deploymentId = res.data.id;
+     console.log("🚀 Deployment スケジュール完了:", deploymentId);
+
+     // orchDeploymentId を保存
+     const currentVars = JSON.parse(fs.readFileSync(userDefinedPath, 'utf8'));
+     currentVars.orchDeploymentId = deploymentId;
+     fs.writeFileSync(userDefinedPath, JSON.stringify(currentVars, null, 2), 'utf8');
+     console.log("💾 orchDeploymentId を user_defined_variable.json に保存しました。");
+
+     return deploymentId;
    }
    ```
    
@@ -347,6 +350,7 @@
    - このファイルの更新コードは次のようになっています：
    ```js
    // .cdsrc.json 更新
+   ([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/02_migrateDeploymentId.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/02_migrateDeploymentId.js))
    cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${chatModelDeploymentId}`;
    cdsrc.requires.GENERATIVE_AI_HUB.EMBEDDING_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${embeddingModelDeploymentId}`;
    cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_API_VERSION = chatModelDeploymentVersion;
