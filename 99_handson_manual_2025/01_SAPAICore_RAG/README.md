@@ -174,10 +174,9 @@
    ```
    node 02_pipelineAPI/02_uploadDocs.js SAP_AI_Core_Overview.pdf
    ```
-    - この際には、AWS SDK for JavaScriptを用いてアップロードが行われている。
+    - この際には、AWS SDK for JavaScriptを用いてアップロードが行われている。([01_grounding/02_pipelineAPI/02_uploadDocs.js](../../01_grounding/02_pipelineAPI/02_uploadDocs.js))
     - 1時間の事前署名付きのURL（アップロードしたpdfを無認証で閲覧できるURL）が出力される。
-    ([01_grounding/02_pipelineAPI/02_uploadDocs.js](../../01_grounding/02_pipelineAPI/02_uploadDocs.js))
-   ```js
+    ```js
     // AWS S3 クライアントの設定
     const s3 = new AWS.S3({
         accessKeyId: s3Info.accessKeyId,
@@ -225,9 +224,8 @@
    ```
    node 02_pipelineAPI/03_createPipeline.js
    ```
-    - このスクリプトでは、S3タイプのリポジトリ（ドキュメントの格納庫）に対して、SAP AI CoreのAPI経由でパイプラインを作成している。これにより、そこに格納されている文書が定期的（現時点では1回/日）にクロールされるようになる。
+    - このスクリプトでは、S3タイプのリポジトリ（ドキュメントの格納庫）に対して、SAP AI CoreのAPI経由でパイプラインを作成している。([01_grounding/02_pipelineAPI/03_createPipeline.js](../../01_grounding/02_pipelineAPI/03_createPipeline.js))これにより、そこに格納されている文書が定期的（現時点では1回/日）にクロールされるようになる。
     ```js
-    ([01_grounding/02_pipelineAPI/03_createPipeline.js](../../01_grounding/02_pipelineAPI/03_createPipeline.js))
     async function createS3Pipeline(token) {
         const url = `${AI_API_HOST}/v2/lm/document-grounding/pipelines`;
 
@@ -297,9 +295,8 @@
    ```
    node 03_retrievalAPI/06_searchRetrieval.js "リソースグループとは"
    ```
-    - このスクリプトでも、SAP AI CoreのAPI経由で検索を行っている。
+    - このスクリプトでも、SAP AI CoreのAPI経由で検索を行っている。([01_grounding/03_retrievalAPI/06_searchRetrieval.js](../../01_grounding/03_retrievalAPI/06_searchRetrieval.js))
     ```js
-    ([01_grounding/03_retrievalAPI/06_searchRetrieval.js](../../01_grounding/03_retrievalAPI/06_searchRetrieval.js))
     async function searchRetrieval(token, query, repositoryId = '*', maxChunkCount = 3) {
         const url = `${AI_API_HOST}/v2/lm/document-grounding/retrieval/search`;
 
@@ -348,9 +345,8 @@
    ```
    node 04_vectorAPI/07_manageCollection.js create folkTale text-embedding-ada-002
    ```
-   - このスクリプトはSAP AI CoreのVector APIを使用してコレクション（データリポジトリ）を作成します。
+   - このスクリプトはSAP AI CoreのVector APIを使用してコレクション（データリポジトリ）を作成します。([01_grounding/04_vectorAPI/07_manageCollection.js](../../01_grounding/04_vectorAPI/07_manageCollection.js))
    ```js
-   ([01_grounding/04_vectorAPI/07_manageCollection.js](../../01_grounding/04_vectorAPI/07_manageCollection.js))
    async function createCollection(token, title, embeddingModelName) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections`;
        const payload = {
@@ -372,9 +368,8 @@
    ```
    node 04_vectorAPI/07_manageCollection.js list
    ```
-   - このコマンドで作成されたコレクションの一覧とIDが表示されます。
+   - このコマンドで作成されたコレクションの一覧とIDが表示されます。([01_grounding/04_vectorAPI/07_manageCollection.js](../../01_grounding/04_vectorAPI/07_manageCollection.js))
    ```js
-   ([01_grounding/04_vectorAPI/07_manageCollection.js](../../01_grounding/04_vectorAPI/07_manageCollection.js))
    async function listCollections(token) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections`;
        const res = await axios.get(url, getRequestOptions(token));
@@ -385,9 +380,8 @@
    ```
    node 04_vectorAPI/08_manageDocument.js create <RepositoryID> docs/Momotaro.txt
    ```
-   - このスクリプトは物語のテキストをチャンク（断片）に分割して、ベクトルDBに保存します。
+   - このスクリプトは物語のテキストをチャンク（断片）に分割して、ベクトルDBに保存します。([01_grounding/04_vectorAPI/08_manageDocument.js](../../01_grounding/04_vectorAPI/08_manageDocument.js))
    ```js
-   ([01_grounding/04_vectorAPI/08_manageDocument.js](../../01_grounding/04_vectorAPI/08_manageDocument.js))
    async function createDocument(token, collectionId, filePath) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/collections/${collectionId}/documents`;
        const rawText = fs.readFileSync(filePath, 'utf8');
@@ -420,9 +414,8 @@
    node 04_vectorAPI/08_manageDocument.js search "桃から生まれる" <RepositoryID>
    ```
    - シェル内での編集が難しい場合は、ツールバーか別の場所で編集してペースト
-   - このスクリプトは、ベクトル検索を使って関連する文書を取得します。
+   - このスクリプトは、ベクトル検索を使って関連する文書を取得します。([01_grounding/04_vectorAPI/08_manageDocument.js](../../01_grounding/04_vectorAPI/08_manageDocument.js))
    ```js
-   ([01_grounding/04_vectorAPI/08_manageDocument.js](../../01_grounding/04_vectorAPI/08_manageDocument.js))
    async function vectorSearch(token, query, collectionId) {
        const url = `${AI_API_HOST}/v2/lm/document-grounding/vector/search`;
        const payload = {
@@ -469,9 +462,8 @@
    ```
    node 01_prerequisites/01_createOrchDeployment.js deploy
    ```
-   - このスクリプトは、オーケストレーション用のConfiguration（構成）とDeployment（デプロイメント）を作成します。
+   - このスクリプトは、オーケストレーション用のConfiguration（構成）とDeployment（デプロイメント）を作成します。([02_orchestration/01_prerequisites/01_createOrchDeployment.js](../../02_orchestration/01_prerequisites/01_createOrchDeployment.js))
    ```js
-   ([02_orchestration/01_prerequisites/01_createOrchDeployment.js](../../02_orchestration/01_prerequisites/01_createOrchDeployment.js))
    // Configuration作成
    async function createConfiguration(token) {
      const url = `${AI_API_HOST}/v2/lm/configurations`;
@@ -524,9 +516,8 @@
    ```
    node 01_prerequisites/01_createOrchDeployment.js check
    ```
-   - このコマンドでデプロイメントの状態を確認します。「RUNNING」状態になれば利用可能です。
+   - このコマンドでデプロイメントの状態を確認します。「RUNNING」状態になれば利用可能です。([02_orchestration/01_prerequisites/01_createOrchDeployment.js](../../02_orchestration/01_prerequisites/01_createOrchDeployment.js))
    ```js
-   ([02_orchestration/01_prerequisites/01_createOrchDeployment.js](../../02_orchestration/01_prerequisites/01_createOrchDeployment.js))
    async function checkDeploymentStatus(token, deploymentId) {
      const url = `${AI_API_HOST}/v2/lm/deployments/${deploymentId}`;
      const res = await axios.get(url, {
@@ -593,9 +584,8 @@
    ```
    node 02_orchestration/01_callOrchEndpoint.js "桃から生まれたのは誰？"
    ```
-   - このスクリプトは、SAP AI CoreのOrchestrationエンドポイントを呼び出して、RAGパイプラインを実行します。
+   - このスクリプトは、SAP AI CoreのOrchestrationエンドポイントを呼び出して、RAGパイプラインを実行します。([02_orchestration/02_orchestration/01_callOrchEndpoint.js](../../02_orchestration/02_orchestration/01_callOrchEndpoint.js))
    ```js
-   ([02_orchestration/02_orchestration/01_callOrchEndpoint.js](../../02_orchestration/02_orchestration/01_callOrchEndpoint.js))
    // Orchestrationエンドポイント呼び出し
    async function callOrchestrationCompletion(token, userInputParams) {
      const url = `${deploymentUrl}/completion`;

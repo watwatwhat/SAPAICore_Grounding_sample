@@ -214,10 +214,9 @@
    node 03_createLLMDeployments/01_init.js
    ```
    - プロンプトが表示されたら、メニューから「2」を選択（Embedding + Chatモデル）
-   - このスクリプトではまず、LLMモデルをデプロイするためのConfiguration（構成）を作成します：
+   - このスクリプトではまず、LLMモデルをデプロイするためのConfiguration（構成）を作成します：([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js))
    ```js
    // Configurationの作成
-   ([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js))
    async function createConfiguration(token, modelName, modelVersion, modelType) {
      const url = `${AI_API_HOST}/v2/lm/configurations`;
      const payload = {
@@ -253,10 +252,9 @@
    }
    ```
    
-   - 次に、作成したConfigurationを使用してデプロイメントを作成します：
+   - 次に、作成したConfigurationを使用してデプロイメントを作成します：([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js))
    ```js
    // Deploymentの作成
-   ([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/01_init.js))
    async function createDeployment(token, configurationId) {
      const url = `${AI_API_HOST}/v2/lm/deployments`;
      const payload = {
@@ -347,10 +345,9 @@
    }
    ```
    
-   - このファイルの更新コードは次のようになっています：
+   - このファイルの更新コードは次のようになっています：([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/02_migrateDeploymentId.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/02_migrateDeploymentId.js))
    ```js
    // .cdsrc.json 更新
-   ([05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/02_migrateDeploymentId.js](../../05_aiAgentApp_simple/manualTasks/03_createLLMDeployments/02_migrateDeploymentId.js))
    cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${chatModelDeploymentId}`;
    cdsrc.requires.GENERATIVE_AI_HUB.EMBEDDING_MODEL_DEPLOYMENT_URL = `v2/inference/deployments/${embeddingModelDeploymentId}`;
    cdsrc.requires.GENERATIVE_AI_HUB.CHAT_MODEL_API_VERSION = chatModelDeploymentVersion;
@@ -481,7 +478,7 @@
      node 04_test_requests/python/test.js -> chat
      ```
    - プロンプトが表示されたら「chat」と入力
-   - このテストでは、単純にAI CoreのLLM APIに直接チャットリクエストを送信します。
+   - このテストでは、単純にAI CoreのLLM APIに直接チャットリクエストを送信します。([05_aiAgentApp_simple/manualTasks/04_test_requests/python/test.js](../../05_aiAgentApp_simple/manualTasks/04_test_requests/python/test.js))
    ```js
    const response = await executeHttpRequest(destination, {
        method: 'POST',
@@ -503,7 +500,7 @@
    ```
    - プロンプトが表示されたら「chain」と入力
    - このテストでは、LangChainフレームワークを使用したAI Agentの機能を実行します。
-   - 送信される質問の例:
+   - 送信される質問の例:([05_aiAgentApp_simple/manualTasks/04_test_requests/python/test.js](../../05_aiAgentApp_simple/manualTasks/04_test_requests/python/test.js))
    ```js
    data: {
        question: "SAP BTP Hackathonについて質問です。SAP AI Launchpadに「Generative AI Hub」のメニューが表示されていないのですが、考えられる原因はなんですか？",
@@ -511,10 +508,6 @@
        history: []
    }
    ```
-   - ログを確認し、AI Agentが以下のことを行っていることを確認:
-     1. どう行動するべきかを考える
-     2. RAG（Retrieval Augmented Generation）を実行してナレッジベースから関連情報を取得
-     3. 関連情報を活用して回答を生成
 
 5. 注意事項
    - ログに表示される入力メッセージ（msg）はUnicodeエスケープされて表示されている
