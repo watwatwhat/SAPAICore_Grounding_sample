@@ -125,9 +125,6 @@ resources:
       config:
         xsappname: aiagentsample-simple-deepdiveXXX
         tenant-mode: dedicated
-  # SAP HANA Cloud のインスタンス
-  # - name: aiagentsample-simple-deepdiveXXX-db
-  #   type: org.cloudfoundry.existing-service
   # SAP AI Core のインスタンス
   - name: default_aicore
     type: org.cloudfoundry.existing-service

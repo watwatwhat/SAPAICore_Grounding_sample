@@ -7,6 +7,140 @@
 
 このハンズオンでは、SAP BTPでAI Agentをホストする方法を学びます。CAP（Cloud Application Programming）アプリケーションとPythonベースのLangChainフレームワークを組み合わせて、知識DBとAI Agentを構築します。
 
+## 概要
+このAI Agentアプリケーションは、SAP BTP上でアプリケーションを開発する際に利用するMulti Target Application(MTA)というフレームワークに基づいて構成されている。
+このMTAは、マイクロサービスを利用してアプリケーションを構成し、いくつかのサービスをまとめて一つのアプリケーションとして管理できる仕組みである。
+
+例えば、今回の場合は`mta.yaml`というファイルに構成情報が記載されており、主要な部分を抜粋すると、下記のようになる。
+
+```yaml
+    # メタデータ。
+    _schema-version: 3.3.0
+    ID: aiagentsample-simple-deepdiveXXX # アプリケーションのID。この粒度でアプリケーションをまるっと管理することができる。
+    version: 1.0.0
+    description: "CAP and python."
+    ...
+    build-parameters:
+    before-all:
+    # デプロイ前に実行するビルド方法をカスタムで指定する
+    - builder: custom
+        # ビルド時に、下記のコマンドを実行する
+        commands:
+        - npm install --prefix cap # capディレクトリ配下で、npm install を実行し、CAPモジュールの依存関係をインストールする
+        - cds build --project cap # capディレクトリ配下で、cds build コマンドを実行し、プロジェクトをデプロイするためのオブジェクトを生成する
+
+    # アプリケーションを構成するモジュール群の宣言。
+    # アプリ本体や、認証用のインスタンス、AI Coreインスタンスなどを定義する。
+    modules:
+    # モジュール (1): AI Agent (LangChain) を実行するPythonモジュール。
+    # Flask (Webサーバー用のフレームワーク) の中に、LangChain (AI Agent用のフレームワーク) を構成している。
+    - name: aiagentsample-simple-deepdiveXXX-ai-agent-srv
+        type: python
+        # モジュールのソースコードがどこにあるかを宣言。
+        # mta.yamlから見て、pythonディレクトリの中にソースコードがあるので、その相対パスを指定
+        path: python
+        ...
+        buildpack: python_buildpack # Python のアプリケーションであること（Pythonのランタイムを利用したいこと）を宣言
+        ...
+        provides:
+        - name: agent-srv-api # このアプリケーションのホスティングURLをagent-srv-apiとしてexposeし、このmta.yamlの中で利用できるようにすることを宣言
+            properties:
+            srv-url: ${default-url}
+        
+        # 各種のモジュール(依存関係)をバインド = このモジュールの立ち上げにこれらのサービスを必須とすることを宣言
+        requires:
+        - name: aiagentsample-simple-deepdiveXXX-db # DB (SAP HANA Cloud) のインスタンス
+        - name: aiagentsample-simple-deepdiveXXX-destination # Destination (外部システムへの宛先管理サービス)のインスタンス
+        - name: aiagentsample-simple-deepdiveXXX-auth # XSUAA (認証認可サービス) のインスタンス
+        - name: default_aicore # SAP AI Core のインスタンス
+        - name: default_logging # SAP Cloud Logging のインスタンス
+
+    # モジュール (2): CAP を実行するNode.jsモジュール。
+    # Node.js の CAP を実行し、SAP HANA Cloudに対してデータのCRUD処理を行うバックエンドサービスとして機能する。
+    - name: aiagentsample-simple-deepdiveXXX-cap-srv
+        type: nodejs
+        # モジュールのソースコードがどこにあるかを宣言。
+        # CAPでは、デプロイ前に cds build というコマンドでランタイムオブジェクトを作成するが、それがcap/genに生成される。
+        path: cap/gen/srv 
+        ...
+        parameters:
+        instances: 1
+        buildpack: nodejs_buildpack # Node.js のアプリケーションであること（Node.jsのランタイムを利用したいこと）を宣言
+        ...
+        provides:
+        - name: srv-api # このアプリケーションのホスティングURLを srv-api としてexposeし、このmta.yamlの中で利用できるようにすることを宣言
+            properties:
+            srv-url: ${default-url}
+        # 各種のモジュール(依存関係)をバインド = このモジュールの立ち上げにこれらのサービスを必須とすることを宣言
+        requires:
+        - name: aiagentsample-simple-deepdiveXXX-db # DB (SAP HANA Cloud) のインスタンス
+        - name: aiagentsample-simple-deepdiveXXX-destination # Destination (外部システムへの宛先管理サービス)のインスタンス
+        - name: aiagentsample-simple-deepdiveXXX-auth # XSUAA (認証認可サービス) のインスタンス
+        - name: default_aicore # SAP AI Core のインスタンス
+        - name: default_logging # SAP Cloud Logging のインスタンス
+
+    # モジュール (3): db-deployer: DB に対してテーブルの作成や初期データのロードをさせるためのモジュール。デプロイ時に一時的に起動し、デプロイ完了後には自動的に停止する。
+    # Node.js の CAP を実行し、SAP HANA Cloudに対してデータのCRUD処理を行うバックエンドサービスとして機能する。
+    - name: aiagentsample-simple-deepdiveXXX-db-deployer
+        type: hdb
+        ...
+        buildpack: nodejs_buildpack # Node.js のアプリケーションであること（Node.jsのランタイムを利用したいこと）を宣言
+        # DB をバインド = このモジュールの立ち上げにこれらのサービスを必須とすることを宣言
+        requires:
+        - name: aiagentsample-simple-deepdiveXXX-db  # DB (SAP HANA Cloud) のインスタンス
+
+    # アプリケーションで利用するリソース（マイクロサービス）の宣言。
+    # 認証認可やDB、AI Core、ロギングなどのコンポーネントを定義する。ここで定義することで、上記のモジュールの中で、依存関係として利用できるようになる。
+    resources:
+    ## リソース (1): SAP HANA Cloud HDIコンテナ のインスタンス
+    - name: aiagentsample-simple-deepdiveXXX-db
+        type: com.sap.xs.hdi-container
+        parameters:
+        service: hana
+        service-plan: hdi-shared
+    ## リソース (2): Destination のインスタンス
+    - name: aiagentsample-simple-deepdiveXXX-destination
+        # managed-service により、デプロイ時にアプリケーションと紐づいた形で自動的にモジュールを管理することを宣言。
+        type: org.cloudfoundry.managed-service
+        parameters:
+        config:
+            ...
+            # Destinationインスタンスに自動的に登録するDestinationの一覧
+            init_data:
+            instance:
+                destinations:
+                # CAP に対する宛先を登録
+                - Authentication: BasicAuthentication # CAPにはBasic認証をかけているので、認証タイプを宣言
+                  User: deepdiveXXX  # Basic認証のユーザー名
+                  Password: deepdiveXXX  # Basic認証のパスワード
+                  HTML5.DynamicDestination: true
+                  Name: aiagentsample-simple-deepdiveXXX-cap-srv # 宛先の名前。CAPモジュールであることがわかるように。
+                  ProxyType: Internet
+                  Type: HTTP
+                  URL: ~{srv-api/srv-url} # srv-api はCAPモジュールで定義したURL。そこをポイントして宛先にすることを宣言。
+                ...
+        service: destination
+        ...
+        requires:
+        - name: srv-api
+        - name: agent-srv-api
+    ## リソース (3): XSUAA のインスタンス
+    - name: aiagentsample-simple-deepdiveXXX-auth
+        # managed-service により、デプロイ時にアプリケーションと紐づいた形で自動的にモジュールを管理することを宣言。
+        type: org.cloudfoundry.managed-service
+        parameters:
+        service: xsuaa
+        ...
+    ## リソース (4): SAP AI Core のインスタンス
+    - name: default_aicore
+        # existing-service により、アプリケーションとは分離された状態で、元から環境にあるインスタンスを利用することを宣言。
+        type: org.cloudfoundry.existing-service
+    ## リソース (5): SAP Cloud Logging のインスタンス
+    - name: default_logging
+        # existing-service により、アプリケーションとは分離された状態で、元から環境にあるインスタンスを利用することを宣言。
+        type: org.cloudfoundry.existing-service
+```
+
 ## CAP（知識DBへのデータの出し入れを担当）
 
 ### 1. アプリをデプロイする
